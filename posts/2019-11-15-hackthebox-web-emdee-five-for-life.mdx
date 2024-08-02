@@ -1,0 +1,78 @@
+---
+title: 'HackTheBox - [WEB] Emdee five for life'
+summary: "Let's start a second web challenge on HTB, this one is called Emdee five for life.
+It's only worth 20 points too, so it should be an easy one..."
+---
+
+Let's start a second web challenge on HTB, this one is called Emdee five for life.
+It's only worth 20 points too, so it should be an easy one...
+
+The only description we have before starting the challenge instance is:
+
+> Can you encrypt fast enough?
+
+After starting the challenge instance, we land on this webpage:
+
+![webpage](/blog/hackthebox-web-emdee-five-for-life/webpage-1.png)
+
+The webpage provide us a string, and the purpose is to send the MD5 hash of this string.
+
+Easy, let's go to this website to encrypt the string: [https://md5decrypt.net/](https://md5decrypt.net/)
+
+Ok, we now know that the MD5 hash of **mKLopMuyMYtWvvflbpNi is 8eb5f6b4e268fcb945adae6e5b07947e**,
+so let's validate the challenge!
+
+![webpage 2](/blog/hackthebox-web-emdee-five-for-life/webpage-2.png)
+
+Aoutch! It was too easy to be real, the webpage tell us that we were too slow and give us a new string to encrypt.
+
+Let's see what happen when we click on **Submit** button with **BurpSuite**:
+
+![BurpSuite](/blog/hackthebox-web-emdee-five-for-life/burp-1.png)
+
+A POST request with data "hash=ourhash" is sent, and we can see that the POST request contain a
+Cookie header **PHPSESSID=tgr5iis70c01731l6h9o1masr7**.
+
+Now that we have these information we can create a python script that will send the POST request with the MD5 hash of
+the string and without forgetting the cookie.
+
+```python
+import requests, hashlib
+from bs4 import BeautifulSoup
+
+url = "http://docker.hackthebox.eu:30966"
+
+s = requests.session()
+response = s.get(url)
+
+soup = BeautifulSoup(response.content, "lxml")
+
+str = soup.h3.string
+hash = hashlib.md5(str.encode()).hexdigest()
+
+myobj = {'hash': hash}
+
+flag = s.post(url, data = myobj)
+
+print(flag.text)
+```
+
+I use **requests.session()** to use the cookie in the POST request, I also use the python library **BeautifulSoup**
+which allows to get the html of the webpage. Then I use **hashlib** which allows to encrypt the string into MD5.
+And finaly I send the POST request and print the server response who contain the flag.
+
+Don't forget to add execution right to the python script:
+
+```shell
+chmod +x md5_chall.py
+```
+
+And let's execute it:
+
+```shell
+python md5_chall.py
+```
+
+![terminal result](/blog/hackthebox-web-emdee-five-for-life/bingo-2.png)
+
+BINGO! The flag is in the html response!

