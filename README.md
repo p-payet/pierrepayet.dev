@@ -11,3 +11,5 @@ How to get this site running locally:
 - To develop the site: `npm run dev`
 - To build the site for production: `npm run build`
 - The site should now be running at http://localhost:3000
+
+Thanks to Alex Pate for the original source code: [https://github.com/alexpate/www](https://github.com/alexpate/www).
