@@ -1,10 +1,6 @@
-import Image from 'next/image';
 import dayjs from 'dayjs';
-import 'dayjs/locale/fr';
-
-const duration = require('dayjs/plugin/duration');
-dayjs.extend(duration);
-dayjs.locale('fr');
+import { dayjsExt } from '@/lib/dayjs-extend';
+import Image from 'next/image';
 
 export interface ExperienceProps {
   company: string;
@@ -25,15 +21,15 @@ export function Experience({
   endDate,
   logo,
 }: ExperienceProps) {
-  const dayjsStartDate = dayjs(startDate);
-  const dayjsEndDate = endDate ? dayjs(endDate) : dayjs();
+  const dayjsStartDate = dayjsExt(startDate);
+  const dayjsEndDate = endDate ? dayjsExt(endDate) : dayjsExt();
 
   const formattedStartDate = formatDate(dayjsStartDate);
-  const formattedEndDate = dayjsEndDate.isSame(dayjs(), 'month')
+  const formattedEndDate = dayjsEndDate.isSame(dayjsExt(), 'month')
     ? "Aujourd'hui"
     : formatDate(dayjsEndDate);
 
-  const diff = dayjs.duration(dayjsEndDate.diff(dayjsStartDate));
+  const diff = dayjsExt.duration(dayjsEndDate.diff(dayjsStartDate));
   let diffYears = diff.years();
   // Add one month to compensate dayjs's duration strange calculation
   let diffMonths = diff.months() + 1;
