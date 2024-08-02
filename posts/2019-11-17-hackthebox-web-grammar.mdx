@@ -1,0 +1,87 @@
+---
+title: 'HackTheBox - [WEB] Grammar'
+summary: "Ready for a new challenge? Let's rock the one named Grammar, this time it's a 70 points challenge."
+---
+
+Ready for a new challenge? Let's rock the one named Grammar, this time it's a 70 points challenge.
+
+As the description says:
+
+> When we access this page we get a Forbidden error. However we believe that something strange lies behind...
+> Can you find a way in and retrieve the flag?
+
+![access forbidden](/blog/hackthebox-web-grammar/access.png)
+
+So this Forbidden page is definitely not a surprise. Let's see if we can find some directories with **DirBuster**:
+
+![dirbuster](/blog/hackthebox-web-grammar/dirbuster.png)
+
+Sadly we can't find nothing with DirBuster, so let's move and try someting else.
+Let's see what is the server response by using curl on the **index.php**:
+
+```shell
+curl docker.hackthebox.eu:32410/index.php -v
+```
+
+![terminal curl command result](/blog/hackthebox-web-grammar/curl.png)
+
+Nothing to declare here either, it's a classic forbidden response from a HTTP GET request...
+but what if we try to do some **Verb Tampering**?
+It's an attack that exploit vulnerabilities in HTTP methods.
+Many authentication mechanisms only limit access to the most common HTTP methods,
+thus allowing unauthorized access to restricted resources by other HTTP methods.
+If you want to learn more about this attack you can go [here](https://www.imperva.com/learn/application-security/http-verb-tampering/).
+
+After trying different methods, the OPTIONS method seems to be exploitable:
+
+```shell
+curl -X OPTIONS docker.hackthebox.eu:32410/index.php -v
+```
+
+![terminal curl command result](/blog/hackthebox-web-grammar/curl-2.png)
+
+We can see that the server responded by sending us a cookie, and the response contains as well a POST HTTP form with the comment:
+
+> HTB hint: really not important... totally solvable without using it!
+> Just there to fill things and to save you from some trouble you might get into :)
+
+Ok, so let's trust this hint and do not dwell on this form. We will rather focus on the cookie the server kindly sent us.
+It seems to be incoded in Base64, we can decoding it by using this [site](https://www.base64decode.org/).
+
+On first try it's not working, and the reason is that there is some junk data at the end of the encoded cookie,
+so after removing the **%3D%3D**, who have nothing to do here, the result is some json format data:
+
+```json
+{
+  "User": "whocares",
+  "Admin": "False",
+  "MAC": "ff6d0a568d61e5a03bcdb04509d5885d"
+}
+```
+
+First reflex, let's try to send a request with the **Admin** cookie field set to **True**:
+
+![terminal curl command result](/blog/hackthebox-web-grammar/huh.png)
+
+> What are you trying to do huh?
+
+It seems that modifying the Admin field is not enough to get access. So let's look at the **MAC** cookie field.
+
+The page we want to access is index.php, and we assume that there should be a PHP code that verify if we have
+the correct MAC value for letting us get the access. So we can possibly exploit a **Type Juggling**.
+There is a weird behavior in PHP comparison mechanism... If PHP decides that both operands look like numbers,
+even if they are actually strings, it will convert them both and perform a numeric comparison.
+You can read this [document](https://www.owasp.org/images/6/6b/PHPMagicTricks-TypeJuggling.pdf)
+if you want to learn more about Type Juggling.
+
+So by changing the MAC field to the value **0** we can trigger a PHP Type Juggling and thus bypassing the cookie verification.
+
+```json
+{ "User": "whocares", "Admin": "True", "MAC": 0 }
+```
+
+Let's try:
+
+![terminal flag result](/blog/hackthebox-web-grammar/bingo.png)
+
+BINGO! The flag appear in the html response between the \<h1\> tag!
