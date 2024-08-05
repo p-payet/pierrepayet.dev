@@ -68,7 +68,7 @@ export default async function Post({ params }: { params: Params }) {
         <span className="text-slate-500 text-sm tracking-tight font-mono block mt-4">
           Publié le{' '}
           <time dateTime={post.date}>
-            {new Intl.DateTimeFormat('en-GB', {
+            {new Intl.DateTimeFormat('fr-FR', {
               dateStyle: 'medium',
             }).format(new Date(post.date))}
           </time>
