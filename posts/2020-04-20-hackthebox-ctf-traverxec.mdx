@@ -1,0 +1,149 @@
+---
+title: 'HackTheBox - [CTF] Traverxec'
+summary: "Let's start another CTF on HackTheBox, the name of the machine is Traverxec and it's rated as difficulty easy."
+---
+
+![banner](/blog/hackthebox-ctf-traverxec/banner.png)
+
+Let's start another CTF on HackTheBox, the name of the machine is Traverxec and it's rated as difficulty easy.
+
+Before starting anything, we already can guess what kind of exploit we are going to face just by the name of the machine.
+Traver reminds of Directory Traversal exploit, and xec reminds of command execution... let's see if it's correct.
+
+First, let's enumerate the open ports on the machine with nmap:
+
+![nmap](/blog/hackthebox-ctf-traverxec/nmap.png)
+
+We can see that the machine is running a 1.9.6 nostromo server on the port 80, interesting...
+
+![port 80 access](/blog/hackthebox-ctf-traverxec/access.png)
+
+With a simple google search we can find an exploit for this version of nostromo:
+[Nostromo 1.9.6 Directory Traversal / Remote Command Execution](https://packetstormsecurity.com/files/155045/Nostromo-1.9.6-Directory-Traversal-Remote-Command-Execution.html),
+looks like we guessed well about the exploit type.
+
+We can verify that the server is vulnerable to this exploit by simply adding **/.%0D./.%0D./.%0D./.%0D./** to the url:
+
+![traversal](/blog/hackthebox-ctf-traverxec/traversal.png)
+
+YES! We can can access the / directory of the server.
+So now let's run [this metasploit module exploit](https://packetstormsecurity.com/files/155045/Nostromo-1.9.6-Directory-Traversal-Remote-Command-Execution.html) to get an easy shell:
+
+![shell metasploit](/blog/hackthebox-ctf-traverxec/shell-metasploit.png)
+
+We now have a shell with the www-data user, the next goal is to get a shell with a real system user.
+
+By browsing the different directories, one in particular seems interesting: **/var/nostromo/conf**.
+This directory contain the nostromo configuration file: **nhttpd.conf**. Let's see what is inside:
+
+![nhttpd conf](/blog/hackthebox-ctf-traverxec/nhttpd-conf.png)
+
+Let's do a quick google search for the nostromo man page to understand more this configuration file.
+[Here it is](http://www.nazgul.ch/dev/nostromo_man.html).
+
+So there seems to be a htpasswd file at this emplacement: **/var/nostromo/conf/.htpasswd**. Let's cat it:
+
+![cat htpasswd file](/blog/hackthebox-ctf-traverxec/cat-htpasswd.png)
+
+A password hash for the user david, interesting! Let's heat **JohnTheRipper** to crack it:
+
+![johntheripper](/blog/hackthebox-ctf-traverxec/johntheripper.png)
+
+Wow it was fast, the password found by john is: **Nowonly4me**.
+We can now think that we have access to the user david with this password, but no no no.
+All the attempt to login to david with su or ssh failed. There must be a reason, let's read de **nhttpd.conf** file man page again.
+
+> BASIC AUTHENTICATION
+
+> To ask for basic authentication on certain directories within your
+> docroot you have to create a file in that directory named like set by the
+> htaccess option in your configfile.
+
+And:
+
+> The list of authorized users and their passwords (DES encrypted) are
+> stored in the file set by the htpasswd option in configfile.
+
+So the credentials we just cracked are not for getting access of the system user david,
+but it's for accessing a certain directory in the nostromo web server.
+The man page also say that about HOMEDIRS part:
+
+> To serve the home directories of your users via HTTP,
+> enable the homedirs option by defining the path in where the home directories are stored, normally /home.
+> To access a users home directory enter a ~ in the URL followed by the home directory name like in this example:
+> http://www.nazgul.ch/~hacki/
+
+We learn here that we can access david's home directory with this url: **10.10.10.165/~david/**.
+There is also an interesting information in the conf file, there is a homedirs_public set to public_www,
+so there should be a **public_www** directory inside the david's home directory. Let's see:
+
+![www public](/blog/hackthebox-ctf-traverxec/www-public.png)
+
+Exactly! We can see that inside there is a **protected-file-area** directory. Let's try to access it with web browser:
+
+![protcted area](/blog/hackthebox-ctf-traverxec/protected-area.png)
+
+The page ask us for user name and password, it's time to use the credential we just cracked minutes ago: **david:Nowonly4me**.
+
+![backup](/blog/hackthebox-ctf-traverxec/backup.png)
+
+In this protected directory there is a compressed file: **backup-ssh-identity-files.tgz**. Let's download and decompress it:
+
+![extract backup](/blog/hackthebox-ctf-traverxec/extract-backup.png)
+
+So this extracted files seems to be ssh private and public key of user david.
+This could be use to connect to the server with ssh with user david.
+But before we can use it, we need to crack the private key passphrase.
+To do this let's use our favorite cracking tool : JohnTheRipper,
+yes there is a john tool that allow to crack ssh private key: **ssh2john**.
+
+```shell
+ssh2john id_rsa > id_rsa.crack
+```
+
+You can see that we converted the key to a crackable hash and then entered it into a text file named id_rsa.crack.
+
+Now let’s use John the Ripper to crack this hash.
+
+![crack ssh key](/blog/hackthebox-ctf-traverxec/crack-ssh-key.png)
+
+Great! We have successfully cracked it! The passphrase used to create the private ssh key is: **hunter**.
+We can now use the private key to connect in ssh with user david. We can specify a private key with the ssh command:
+
+```shell
+ssh -i id_rsa david@10.10.10.165
+```
+
+![ssh](/blog/hackthebox-ctf-traverxec/ssh.png)
+
+Bingo! The user david is our!
+
+We now have to do **privilege escalation** to get root.
+We can see that inside **/home/david/bin** there is an interesting **server-stats.sh** script.
+
+![bin](/blog/hackthebox-ctf-traverxec/bin.png)
+
+![cat script](/blog/hackthebox-ctf-traverxec/cat-script.png)
+
+On the last line, we can see that the script is using the command **sudo** to print the last 5 journal log lines.
+We are gonna use a weird linux behavior to gain a shell with root access.
+
+Let's copy the last line of the script but without the **| /usr/bin/cat**, and then paste it in a new sh script:
+
+```shell
+echo "/usr/bin/sudo /usr/bin/journalctl -n5 -unostromo.service" > elevation.sh
+```
+
+Then, let's run the script, but with minimizing our windows terminal.
+
+![elevation](/blog/hackthebox-ctf-traverxec/elevation.png)
+
+Thus, not all the script output can fit in the terminal windows, and it's here that a weird behavior occur.
+When the journalctl output can not fit in the terminal windows, the terminal open the output in **Visual Mode (vi)**.
+The good things for us is that we can get a shell from this state of vi, [here is more explanation](https://sanctum.geek.nz/arabesque/shell-from-vi/).
+
+We just have to write **!/bin/bash** to get a shell with root access.
+
+![root](/blog/hackthebox-ctf-traverxec/root.png)
+
+BINGO! Machine rooted!
