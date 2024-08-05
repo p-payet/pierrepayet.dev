@@ -60,7 +60,7 @@ You can use this method with Burp, you set up a custom scope (keywords)
 and then you go ahead and browse the site and it will spider all the hosts recursively as you visit them and it
 will fill up your site tree in Burp. So it will show you anything that matches your keywords that you set in the scope.
 
-Demo video here : https://youtu.be/Qw1nNPiH_Go?t=879
+Demo video here: https://youtu.be/Qw1nNPiH_Go?t=879.
 
 ---
 
@@ -69,7 +69,7 @@ The next method is called **DomLink**, the idea with this method is to recursive
 
 ![DomLink](/blog/bug-bounty-hunter-methodology/domlink.gif)
 
-You can find the DomLink tool here : https://github.com/vysecurity/DomLink
+You can find the DomLink tool here: https://github.com/vysecurity/DomLink.
 
 ---
 
@@ -98,7 +98,7 @@ There is two different way of findings subdomains:
 ### Amass
 
 Amass tool have up to 22 sources that it parses from, and includes a ton of exhilarate features for subdomain enumeration.
-You can find the Amass tool here : https://github.com/OWASP/Amass.
+You can find the Amass tool here: https://github.com/OWASP/Amass.
 
 This tool include reverse DNS methods, permutation scanning (when it see a naming nomenclature for a subdomain like Dev-One,
 it will also check for Dev-Two, Dev-Three, etc...).
@@ -124,7 +124,7 @@ MassDNS is a high-performance DNS stub resolver. MassDNS breaks up your list you
 each one of those pieces to a different DNS resolver. Moreover, It's written in C, so it can run a million
 line dictionary for brute forcing in about one and a half minutes.
 
-You can find MassDNS tool here : https://github.com/blechschmidt/massdns.
+You can find MassDNS tool here: https://github.com/blechschmidt/massdns.
 
 Here is a comparison between MassDNS and some others Subdomain Brute Forcing tool:
 
@@ -134,7 +134,7 @@ Subfinder use the same method as MassDNS for brute forcing, so it can be as good
 And if you are looking for a non-multi resolver tool, **GoBuster** is the best one for that case.
 
 So with this method of subdomain brute forcing you need a good list of subdomains to brute force from,
-here you can find some subdomains list : https://github.com/jhaddix/SecLists/tree/master/Discovery/DNS.
+here you can find some subdomains list: https://github.com/jhaddix/SecLists/tree/master/Discovery/DNS.
 
 ### CommonSpeak and Scans.io
 
@@ -149,7 +149,7 @@ These two tools are really useful to build good subdomains list.
 
 ### Some others methods
 
-Here is some others methods of finding subdomains :
+Here is some others methods of finding subdomains:
 
 - Doing DNSSEC/NSEC/NSEC3 parsers and doing INSEC Walking or DNSSEC Walking using these utilities: LDNSUTILS, [NSEC3WALKER](https://dnscurve.org/nsec3walker.html), [NSEC3MAP](https://github.com/anonion0/nsec3map)
 - Github reconnaissance: search for goodies
@@ -227,7 +227,7 @@ python EyeWitness.py --prepend-https -f ../domain/tesla.com.lst  --all-protocols
 **Note**: if you encounter an a 401/403 error page, basic auth, or domain that seems interesting but is somehow locked down,
 it can be useful to look at https://archive.org/web/ entries. Sometimes you can find API keys, or URL structure that
 you can forcefully browse to unprotected content still there.
-These tools can also be used :https://github.com/tomnomnom/waybackurls and https://github.com/mhmdiaa/waybackunifier.
+These tools can also be used: https://github.com/tomnomnom/waybackurls and https://github.com/mhmdiaa/waybackunifier.
 
 ---
 
@@ -282,7 +282,7 @@ You can find the Burp-vulners-scanner here: https://github.com/vulnersCom/burp-v
 
 Content discovery is the idea of brute-forcing URL paths.
 
-- [GoBuster](https://github.com/OJ/gobuster): this is a tool used to brute-force URIs (directories and files) in web sites, DNS subdomains, Virtual Host names on target web servers. It's written in Go and it's really fast. You can use this wordlist with GoBuster : https://gist.github.com/jhaddix/b80ea67d85c13206125806f0828f4d10.
+- [GoBuster](https://github.com/OJ/gobuster): this is a tool used to brute-force URIs (directories and files) in web sites, DNS subdomains, Virtual Host names on target web servers. It's written in Go and it's really fast. You can use this wordlist with GoBuster: https://gist.github.com/jhaddix/b80ea67d85c13206125806f0828f4d10.
 
 ![gobuster](/blog/bug-bounty-hunter-methodology/gobuster.gif)
 
