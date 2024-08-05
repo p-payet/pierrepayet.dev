@@ -7,13 +7,13 @@ import { getAllPosts } from '@/lib/articles';
 import { Title } from '@/app/components/title';
 import { Avatar } from './components/avatar';
 
-const projects: {
+const projects: Array<{
   href?: string;
   title: string;
   description: string;
   image: string;
   technos: Array<string>;
-}[] = [
+}> = [
   {
     title: 'Document Corrector',
     href: 'https://www.document-corrector.com/',
@@ -21,6 +21,16 @@ const projects: {
       "Corrige l'orthographe et la grammaire de documents en utilisant l'AI.",
     image: '/document-corrector.png',
     technos: ['NestJS', 'Next.js', 'PostgreSQL'],
+  },
+];
+
+const linkedinPosts: Array<{
+  href: string;
+  title: string;
+}> = [
+  {
+    href: 'https://www.linkedin.com/posts/pierre-payet-457476136_document-corrector-correcteur-de-documents-activity-7216358008556060672--1ip',
+    title: 'Présentation de Document Corrector.',
   },
 ];
 
@@ -142,6 +152,27 @@ export default async function Home() {
             →
           </span>
         </Link>
+      </section>
+
+      <section className="pt-10 pb-16">
+        <Title as="h2" variant="secondary" className="mb-8">
+          Derniers posts LinkedIn
+        </Title>
+        <ul className="list-disc pl-4">
+          {linkedinPosts.slice(0, 3).map((linkedinPost) => {
+            return (
+              <li key={linkedinPost.title}>
+                <Link
+                  href={linkedinPost.href}
+                  target="_blank"
+                  className="underline"
+                >
+                  {linkedinPost.title}
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
       </section>
     </main>
   );
