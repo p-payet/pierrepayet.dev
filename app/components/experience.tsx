@@ -1,6 +1,6 @@
+import Image from 'next/image';
 import dayjs from 'dayjs';
 import { dayjsExt } from '@/lib/dayjs-extend';
-import Image from 'next/image';
 
 export interface ExperienceProps {
   company: string;

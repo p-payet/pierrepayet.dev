@@ -1,11 +1,11 @@
+import { Metadata, ResolvingMetadata } from 'next';
+import { notFound } from 'next/navigation';
 import { MDXRemote } from 'next-mdx-remote/rsc';
 import { Pluggable } from 'unified';
-import '../../assets/github-dark.css';
-import { notFound } from 'next/navigation';
+import '@/app/assets/github-dark.css';
 import remarkGfm from 'remark-gfm';
 import rehypeHighlight from 'rehype-highlight';
 import { getAllPostPaths, getPostBySlug } from '@/lib/articles';
-import { Metadata, ResolvingMetadata } from 'next';
 import { ScrollAnimationDemoOne } from '@/app/components/posts/2024-05-20-future-css-scroll-animations';
 import {
   TextWrapHero,

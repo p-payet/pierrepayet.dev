@@ -1,18 +1,9 @@
 import Link from 'next/link';
-import { ArticleLink } from './components/article-link';
+import linkedinPosts from '@/app/data/linkedin-posts';
 import { getAllPosts } from '@/lib/articles';
+import { ArticleLink } from '@/app/components/article-link';
 import { Title } from '@/app/components/title';
-import { Avatar } from './components/avatar';
-
-const linkedinPosts: Array<{
-  href: string;
-  title: string;
-}> = [
-  {
-    href: 'https://www.linkedin.com/posts/pierre-payet-457476136_document-corrector-correcteur-de-documents-activity-7216358008556060672--1ip',
-    title: 'Présentation de Document Corrector.',
-  },
-];
+import { Avatar } from '@/app/components/avatar';
 
 export default async function Home() {
   const posts = await getAllPosts({

@@ -1,6 +1,6 @@
-import { PageHeader } from '@/app/components/page-header';
-import { ArticleLink } from '../components/article-link';
 import { getAllPosts } from '@/lib/articles';
+import { PageHeader } from '@/app/components/page-header';
+import { ArticleLink } from '@/app/components/article-link';
 
 export default async function Page() {
   const posts = await getAllPosts({

@@ -1,14 +1,12 @@
-import './assets/globals.css';
-
+import '@/app/assets/globals.css';
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { Analytics } from '@vercel/analytics/react';
 import localFont from 'next/font/local';
 import { JetBrains_Mono } from 'next/font/google';
-
+import { Analytics } from '@vercel/analytics/react';
 import clsx from 'clsx';
-import { Navbar } from './components/navbar';
-import { MobileNavbar } from './components/mobile-navbar';
+import { Navbar } from '@/app/components/navbar';
+import { MobileNavbar } from '@/app/components/mobile-navbar';
 
 const SaansFont = localFont({
   src: './saans-font.woff2',

@@ -1,6 +1,6 @@
-import { Title } from '@/app/components/title';
 import Link from 'next/link';
 import { FC } from 'react';
+import { Title } from '@/app/components/title';
 
 interface Props {
   title: string;
