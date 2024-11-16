@@ -40,8 +40,8 @@ export default async function Home() {
   });
 
   return (
-    <main className="px-4 md:px-0">
-      <section className="pb-14 border-b border-slate-300 mb-14">
+    <main className="grid gap-14 pb-14 px-4 md:px-0">
+      <section className="pb-14 border-b border-slate-300">
         <Avatar status="busy" />
         <h1 className="font-semibold text-4xl mb-5 text-slate-950">
           Salut, je suis Pierre. 👋
@@ -66,7 +66,7 @@ export default async function Home() {
         </Link>
       </section>
 
-      <section className="pb-16">
+      <section>
         <Title as="h2" variant="secondary" className="mb-8">
           Derniers articles
         </Title>
@@ -94,7 +94,7 @@ export default async function Home() {
         </Link>
       </section>
 
-      <section className="pt-10 pb-16">
+      <section>
         <Title as="h2" variant="secondary" className="mb-8">
           Derniers posts LinkedIn
         </Title>
