@@ -67,66 +67,6 @@ export default async function Home() {
       </section>
 
       <section className="pb-16">
-        <Title as="h2" variant="secondary" className="mb-4">
-          Projets personnels
-        </Title>
-
-        <p className="text-slate-700 text-lg">
-          Vous trouverez ci-dessous une sélection de projets récents que
-          j&apos;ai réalisés.
-        </p>
-        <div className="lg:w-full grid grid-cols-1 grid-flow-dense gap-8 mt-16">
-          {projects.map((project) => {
-            const isLink = !!project.href;
-            const WrappingComponent = isLink ? Link : 'div';
-            const technos = project.technos;
-
-            return (
-              <WrappingComponent
-                href={project.href ?? '/'}
-                target="_blank"
-                key={project.title}
-                className={clsx(
-                  'flex flex-col justify-center bg-slate-100 hover:bg-slate-200/70 transition-colors rounded-xl p-8'
-                )}
-              >
-                <div className="relative rounded-xl mb-4 shadow-project">
-                  <Image
-                    width={520}
-                    height={240}
-                    quality={90}
-                    src={project.image}
-                    alt=""
-                    className="rounded-xl bg-cover"
-                  />
-                </div>
-                <h3 className="text-slate-700 font-semibold tracking-tight text-xl">
-                  {project.title}
-                </h3>
-                <h3 className="text-slate-500 text-base">
-                  {project.description}
-                </h3>
-                {technos.length && (
-                  <div className="flex gap-2 mt-2">
-                    {technos.map((techno) => {
-                      return (
-                        <span
-                          key={techno}
-                          className="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-sm font-medium text-green-700 ring-1 ring-inset ring-green-600/20"
-                        >
-                          {techno}
-                        </span>
-                      );
-                    })}
-                  </div>
-                )}
-              </WrappingComponent>
-            );
-          })}
-        </div>
-      </section>
-
-      <section className="pt-10 pb-16">
         <Title as="h2" variant="secondary" className="mb-8">
           Derniers articles
         </Title>
