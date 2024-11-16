@@ -1,28 +1,8 @@
 import Link from 'next/link';
-import Image from 'next/image';
-
 import { ArticleLink } from './components/article-link';
-import clsx from 'clsx';
 import { getAllPosts } from '@/lib/articles';
 import { Title } from '@/app/components/title';
 import { Avatar } from './components/avatar';
-
-const projects: Array<{
-  href?: string;
-  title: string;
-  description: string;
-  image: string;
-  technos: Array<string>;
-}> = [
-  {
-    title: 'Document Corrector',
-    href: 'https://www.document-corrector.com/',
-    description:
-      "Corrige l'orthographe et la grammaire de documents en utilisant l'AI.",
-    image: '/document-corrector.png',
-    technos: ['NestJS', 'Next.js', 'PostgreSQL'],
-  },
-];
 
 const linkedinPosts: Array<{
   href: string;

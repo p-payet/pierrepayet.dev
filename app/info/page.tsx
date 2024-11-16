@@ -59,12 +59,7 @@ export default async function InfoPage() {
         <p>
           À côté de cela, j&apos;ai effectué plusieurs petites missions
           freelance de développement web. J&apos;aime également développer mes
-          propres projets, j&apos;ai récemment mis en ligne un service de
-          correction de documents utilisant l&apos;IA, appelé{' '}
-          <Link href="https://www.document-corrector.com" target="_blank">
-            Document Corrector
-          </Link>
-          .
+          propres projets.
         </p>
       </section>
 
