@@ -30,10 +30,10 @@ pour vérifier que le code respecte bien les spécifications attendues serait un
 ### Première étape : mise en place d'un "Approval Testing"
 
 Fort heureusement, une technique permet d’apporter des modifications
-à un code dépourvu de tests : l’"Approval Testing", parfois appelée "Golden Master".
+à un code dépourvu de tests : l’**"Approval Testing"**, parfois appelée **"Golden Master"**.
 
 Le principe de cette méthode est simple : on écrit un test minimal pour capturer le résultat actuel du code.
-Ce résultat est ensuite enregistré sous forme de "snapshot", qui devient notre référence.
+Ce résultat est ensuite enregistré sous forme de **"snapshot"**, qui devient notre référence.
 À chaque modification du code, on exécute l’Approval Testing.
 Si le résultat obtenu diffère de notre snapshot de référence, alors le test échoue.
 
@@ -148,7 +148,7 @@ Voici quelques exemples de refactorisation faites à l'aide de P42 :
 
 Il s'agit de refactorisations simples, mais qui permettent de dégrossir et de réaliser une première simplification du code.
 
-Dans notre cas, toutes les suggestions de P42 peuvent être appliquées.
+Dans notre cas, toutes les suggestions de **P42** peuvent être appliquées.
 Après chaque modification il ne faut pas oublier de lancer notre Approval Testing pour vérifier
 que le fonctionnement de notre code reste inchangé.
 
