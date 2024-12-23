@@ -1,0 +1,314 @@
+---
+title: 'Gilded Rose Refactoring Kata - TypeScript Solution'
+summary: 'Explication pas-à-pas de la méthode de résolution du kata "Gilded Rose".'
+---
+
+**Lien vers ma solution en TypeScript : https://github.com/p-payet/gilded-rose-refactoring-kata.**
+
+Le kata de refactorisation "Gilded Rose" est un exercice de programmation visant à introduire
+une nouvelle fonctionnalité dans un code legacy, tout en améliorant sa structure et sa maintenabilité.
+
+Le kata est accessible sur ce dépôt GitHub : https://github.com/emilybache/GildedRose-Refactoring-Kata.
+
+À noter que j'ai récupéré le projet **js-jest** du dépôt, et que je lui ai apporté des modifications
+pour ajouter TypeScript au projet.
+
+Et voici le lien vers l'énoncé du kata : https://github.com/emilybache/GildedRose-Refactoring-Kata/blob/main/GildedRoseRequirements.md.
+
+Après avoir pris connaissance de l’énoncé, il pourrait être tentant de se lancer immédiatement
+dans l’implémentation de la nouvelle fonctionnalité demandée. Cependant, ce serait une grave erreur.
+En effet, le code dont nous héritons est dépourvu de tests, et il semble avoir été écrit de manière désorganisée,
+rendant sa compréhension difficile au premier abord.
+
+Toute modification, même la plus minime, du code pourrait entraîner des régressions insoupçonnées.
+Il est donc primordial de s'assurer du bon fonctionnement du code à l'aide de tests.
+Cependant, dans notre cas, aucun test n’est présent, et rédiger l’ensemble des tests nécessaires
+pour vérifier que le code respecte bien les spécifications attendues serait une tâche bien trop chronophage.
+
+---
+
+### Première étape : mise en place d'un "Approval Testing"
+
+Fort heureusement, une technique permet d’apporter des modifications
+à un code dépourvu de tests : l’"Approval Testing", parfois appelée "Golden Master".
+
+Le principe de cette méthode est simple : on écrit un test minimal pour capturer le résultat actuel du code.
+Ce résultat est ensuite enregistré sous forme de "snapshot", qui devient notre référence.
+À chaque modification du code, on exécute l’Approval Testing.
+Si le résultat obtenu diffère de notre snapshot de référence, alors le test échoue.
+
+Cette technique permet de refactoriser le code en toute sérénité, en offrant une garantie que les modifications
+apportées ne casseront pas le comportement actuel du code, tant que l’Approval Testing reste valide.
+
+Pour ce faire, nous allons créer un nouveau fichier **gilded_rose.approval.test.ts** dans le répertoire **test** du projet :
+
+```TypeScript
+import { describe, it, expect } from '@jest/globals';
+import {
+    Item,
+    Shop,
+} from "../src/gilded_rose";
+import {
+    agedBrieItemFactory,
+    backstagePassesItemFactory,
+    conjuredItemFactory,
+    normalItemFactory,
+    sulfurasItemFactory,
+} from './gilded_rose.spec.test';
+
+const runSimulation = (items: Array<Item>, days: number): string => {
+    const shop = new Shop(items);
+    let output = "";
+
+    for (let day = 0; day <= days; day++) {
+      output += `-------- day ${day} --------\n`;
+      output += "name, sellIn, quality\n";
+      items.forEach(item => output += `${item.name}, ${item.sellIn}, ${item.quality}\n`);
+      shop.decreaseSellIn();
+      output += "\n";
+    }
+
+    return output;
+}
+
+describe("Gilded Rose Shop Approval Testing", () => {
+    // Approval Testing (a.k.a: Golden Master)
+    it("should match snapshot", () => {
+      const items = [
+        normalItemFactory(10, 20),
+        agedBrieItemFactory(2, 0),
+        normalItemFactory(5, 7),
+        sulfurasItemFactory(0, 80),
+        sulfurasItemFactory(-1, 80),
+        backstagePassesItemFactory(15, 20),
+        backstagePassesItemFactory(10, 49),
+        backstagePassesItemFactory(5, 49),
+        conjuredItemFactory(3, 6),
+      ];
+      const output = runSimulation(items, 30);
+
+      expect(output).toMatchSnapshot();
+    });
+});
+```
+
+On utilise la méthode **toMatchSnapshot()** de jest pour réaliser notre Approval Testing.
+Pour en savoir plus sur le fonctionnement de cette méthode : https://jestjs.io/docs/snapshot-testing.
+
+---
+
+### Deuxième étape : refactorisation simple à l'aide de l'extension P42
+
+**P42 JS Assistant** est une extension **VS Code**, qui analyse le code et fournit des suggestions de refactorisation.
+
+Lien vers le dépôt GitHub de l'extension : https://github.com/p42ai/js-assistant.
+
+Voici quelques exemples de refactorisation faites à l'aide de P42 :
+
+> Conversion d'une boucle **for** en boucle **for...of** :
+>
+> ```TypeScript
+> for (let i = 0; i < this.items.length; i++) {
+>   ...
+> }
+> ```
+>
+> ```TypeScript
+> for (const item of this.items) {
+>   ...
+> }
+> ```
+
+> Fusion des conditions **if** imbriquées :
+>
+> ```TypeScript
+> if (item.quality > 0) {
+>   if (item.name != "Sulfuras, Hand of Ragnaros") {
+>     ...
+>   }
+> }
+> ```
+>
+> ```TypeScript
+> if (item.quality > 0 && item.name != "Sulfuras, Hand of Ragnaros") {
+>   ...
+> }
+> ``
+> ```
+
+> Conversion d'une assignation en une décrémentation :
+>
+> ```TypeScript
+> item.quality = item.quality - 1;
+> ```
+>
+> ```TypeScript
+> item.quality--;
+> ```
+
+Il s'agit de refactorisations simples, mais qui permettent de dégrossir et de réaliser une première simplification du code.
+
+Dans notre cas, toutes les suggestions de P42 peuvent être appliquées.
+Après chaque modification il ne faut pas oublier de lancer notre Approval Testing pour vérifier
+que le fonctionnement de notre code reste inchangé.
+
+**Remarque :** P42 reste un outil, il ne faut pas non plus appliquer aveuglément toutes les suggestions.
+Il est nécessaire de comprendre chaque modification apportée au code.
+
+---
+
+### Troisième étape : refactorisation approfondie du code
+
+En analysant le code, on constate qu’il contient de nombreuses conditions **if** imbriquées,
+dont une grande partie vérifie la valeur de la propriété **item.name**.
+
+Voici les différentes valeurs de **item.name** actuellement prises en compte :
+
+- "Aged Brie"
+- "Backstage passes to a TAFKAL80ETC concert"
+- "Sulfuras, Hand of Ragnaros"
+- Toute autre valeur
+
+Pour améliorer la lisibilité et maintenir le code plus facilement, il est souhaitable d’extraire la logique
+propre à chacun de ces cas dans des méthodes distinctes.
+Cela permet de respecter le **Single Responsibility Principle** (SRP), en attribuant à chaque méthode une
+seule responsabilité bien définie.
+
+Une technique de refactorisation efficace consiste à dupliquer temporairement le bloc contenant les conditions
+**if** imbriquées. On peut ensuite encapsuler le premier bloc dans une condition vérifiant la première valeur de
+**item.name**, et placer le bloc dupliqué dans un else. Ce processus peut être répété pour isoler progressivement
+la logique de chaque cas dans des méthodes dédiées.
+
+```TypeScript
+if (item.name === "Aged Brie") {
+  ... // code dupliqué
+} else {
+  ... // code dupliqué
+}
+```
+
+Il suffit maintenant de remplacer toutes les conditions vérifiant la valeur de **item.name** par des
+expressions renvoyant directement **true** ou **false**.
+Par exemple :
+
+```TypeScript
+if (
+  item.name != "Aged Brie" &&
+  item.name != "Backstage passes to a TAFKAL80ETC concert"
+) {
+  if (item.quality > 0 && item.name != "Sulfuras, Hand of Ragnaros") {
+    item.quality--;
+  }
+}
+```
+
+devient :
+
+```TypeScript
+if (false && true) {
+  if (item.quality > 0 && true) {
+    item.quality--;
+  }
+}
+```
+
+Ainsi, il ne restera plus que le code appliqué lorsque **item.name** est égal à **"Aged Brie"**.
+Ce code peut alors être extrait dans une méthode dédiée, que l'on nommera **updateAgedBrieQuality()**.
+
+```TypeScript
+updateAgedBrieQuality(item) {
+  if (item.quality < 50) {
+    item.quality++;
+  }
+
+  item.sellIn--;
+
+  if (item.sellIn < 0 && item.quality < 50) {
+    item.quality++;
+  }
+}
+```
+
+Une fois toutes nos méthodes extraites, la méthode **updateQuality()** se résume à un **switch** qui appelle les
+méthodes correspondantes en fonction de la valeur de **item.name**.
+
+```TypeScript
+switch (item.name) {
+  case "Aged Brie": {
+    ...
+  } case "Backstage passes to a TAFKAL80ETC concert": {
+    ...
+  } case "Sulfuras, Hand of Ragnaros" : {
+    ...
+  } default: {
+    ...
+  }
+}
+```
+
+---
+
+### Quatrième étape : remplacer les conditions par l’utilisation du polymorphisme
+
+L'utilisation d'un switch dans la méthode **updateQuality()** de la classe **Shop** peut être un indicateur qu'il est
+temps de tirer parti du polymorphisme. En effet, lorsqu'une méthode exécute différentes actions en fonction de
+la valeur d'une propriété, cela révèle souvent une structure de code sous-optimale.
+
+Pour améliorer cette structure, nous allons implémenter le polymorphisme. Cela consistera à créer des sous-classes
+spécialisées, héritant d'une classe parente dotée d'une méthode **updateQuality()**, que chaque sous-classe pourra
+redéfinir en fonction de ses besoins spécifiques.
+
+```TypeScript
+class NormalItem() {
+  updateQuality() {
+    ...
+  }
+}
+
+class AgedBrie() extends NormalItem {
+  override updateQuality() {
+    ...
+  }
+}
+
+class Sulfuras() extends NormalItem {
+  override updateQuality() {
+    ...
+  }
+}
+
+class BackstagePasses() extends NormalItem {
+  override updateQuality() {
+    ...
+  }
+}
+```
+
+---
+
+### Cinquième étape : ajout de la nouvelle fonctionnalité
+
+Désormais, avec un code clair et bien structuré, nous pouvons intégrer la nouvelle fonctionnalité
+demandée : l'ajout d'un **Conjured item**.
+
+Pour cela, nous adopterons la méthode du **Test-Driven Development** (TDD), qui nous guidera dans l'implémentation de ce
+nouvel **item** de manière progressive et fiable.
+
+Je ne détaillerai pas cette étape ici, mais si vous souhaitez mieux comprendre le concept du TDD,
+je vous recommande vivement cet article de blog : https://blog.ippon.fr/2021/02/05/ca-cest-tdd.
+
+L'ajout de cette nouvelle fonctionnalité aura pour conséquence de casser notre **Approval Testing**.
+Il est donc nécessaire de mettre à jour le **snapshot** avec la commande suivante :
+
+```bash
+jest --updateSnapshot
+```
+
+---
+
+### Sixième étape : rédaction des tests de spécifications manquants
+
+Pour finir, il est important de rédiger tous les tests de spécifications qui pourraient manquer afin de garantir
+la stabilité et la fiabilité du code.
+
+**Pour rappel, vous pouvez accéder à ma solution en TypeScript ici : https://github.com/p-payet/gilded-rose-refactoring-kata.**
