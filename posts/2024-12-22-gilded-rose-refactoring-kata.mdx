@@ -1,6 +1,6 @@
 ---
 title: 'Gilded Rose Refactoring Kata - TypeScript Solution'
-summary: 'Explication pas-à-pas de la méthode de résolution du kata "Gilded Rose".'
+summary: 'Explication étape par étape de la méthode de résolution du kata "Gilded Rose".'
 ---
 
 **Lien vers ma solution en TypeScript : https://github.com/p-payet/gilded-rose-refactoring-kata.**
@@ -25,8 +25,17 @@ Il est donc primordial de s'assurer du bon fonctionnement du code à l'aide de t
 Cependant, dans notre cas, aucun test n’est présent, et rédiger l’ensemble des tests nécessaires
 pour vérifier que le code respecte bien les spécifications attendues serait une tâche bien trop chronophage.
 
+### Sommaire :
+1. [Première étape : mise en place d'un "Approval Testing"](#first-step)
+2. [Deuxième étape : refactorisation simple à l'aide de l'extension P42](#second-step)
+3. [Troisième étape : refactorisation approfondie à l'aide de la méthode de "Décomposition Conditionnelle"](#third-step)
+4. [Quatrième étape : remplacer les conditions par l’utilisation du polymorphisme](#fourth-step)
+5. [Cinquième étape : ajout de la nouvelle fonctionnalité](#fifth-step)
+6. [Sixième étape : rédaction des tests de spécifications manquants](#sixth-step)
+
 ---
 
+<a name="first-step"></a>
 ### Première étape : mise en place d'un "Approval Testing"
 
 Fort heureusement, une technique permet d’apporter des modifications
@@ -97,6 +106,7 @@ Pour en savoir plus sur le fonctionnement de cette méthode : https://jestjs.io/
 
 ---
 
+<a name="second-step"></a>
 ### Deuxième étape : refactorisation simple à l'aide de l'extension P42
 
 **P42 JS Assistant** est une extension **VS Code**, qui analyse le code et fournit des suggestions de refactorisation.
@@ -157,7 +167,8 @@ Il est nécessaire de comprendre chaque modification apportée au code.
 
 ---
 
-### Troisième étape : refactorisation approfondie du code
+<a name="third-step"></a>
+### Troisième étape : refactorisation approfondie à l'aide de la méthode de "Décomposition Conditionnelle"
 
 En analysant le code, on constate qu’il contient de nombreuses conditions **if** imbriquées,
 dont une grande partie vérifie la valeur de la propriété **item.name**.
@@ -248,6 +259,7 @@ switch (item.name) {
 
 ---
 
+<a name="fourth-step"></a>
 ### Quatrième étape : remplacer les conditions par l’utilisation du polymorphisme
 
 L'utilisation d'un switch dans la méthode **updateQuality()** de la classe **Shop** peut être un indicateur qu'il est
@@ -286,6 +298,7 @@ class BackstagePasses() extends NormalItem {
 
 ---
 
+<a name="fifth-step"></a>
 ### Cinquième étape : ajout de la nouvelle fonctionnalité
 
 Désormais, avec un code clair et bien structuré, nous pouvons intégrer la nouvelle fonctionnalité
@@ -306,6 +319,7 @@ jest --updateSnapshot
 
 ---
 
+<a name="sixth-step"></a>
 ### Sixième étape : rédaction des tests de spécifications manquants
 
 Pour finir, il est important de rédiger tous les tests de spécifications qui pourraient manquer afin de garantir
