@@ -2,9 +2,16 @@ import { ExperienceProps } from '@/app/components/experience';
 
 const experiences: Array<ExperienceProps> = [
   {
+    company: 'Inicio',
+    role: 'Développeur FullStack - CDI',
+    startDate: '2025-01-06',
+    logo: '/info/inicio-logo.jpg',
+  },
+  {
     company: 'Métropole de Lyon',
     role: 'Développeur Web - Freelance',
     startDate: '2023-03-01',
+    endDate: '2025-01-03',
     logo: '/info/metropole-de-lyon-logo.jpg',
   },
   {
