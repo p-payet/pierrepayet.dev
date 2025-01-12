@@ -10,21 +10,28 @@ export default async function InfoPage() {
       <PageHeader title="Information" />
       <section className="pb-8 prose prose-lg">
         <p>
-          Je travaille actuellement en tant que développeur web freelance pour
-          la Métropole de Lyon. Intégré au sein d&apos;une équipe dynamique, je
-          contribue à l&apos;ajout de nouvelles fonctionnalités et à
+          Je suis actuellement développeur fullstack chez Inicio, où je
+          contribue à la conception et au développement d&apos;une marketplace
+          internationale. Le but visé est d&apos;accélérer la transition
+          énergétique en facilitant le déploiement des énergies vertes, tant en
+          France qu&apos;à l&apos;international.
+        </p>
+
+        <p>
+          Auparavant, j&apos;ai exercé en tant que développeur web freelance
+          pour la Métropole de Lyon. Au sein d&apos;une équipe dynamique,
+          j&apos;ai contribué à l&apos;ajout de nouvelles fonctionnalités et à
           l&apos;amélioration continue d&apos;une plateforme utilisée par
           plusieurs centaines de milliers d&apos;utilisateurs.
         </p>
 
         <p>
-          Auparavant, j&apos;ai travaillé chez Euronews en tant que développeur
-          back-end. J&apos;ai participé à la migration de l&apos;architecture
-          d&apos;Euronews vers AWS et j&apos;ai contribué à l&apos;ajout de
-          nouvelles fonctionnalités ainsi qu&apos;à l&apos;amélioration continue
-          des outils internes, notamment le CMS utilisé par les journalistes
-          pour rédiger et publier leurs articles sur le site web
-          d&apos;Euronews.
+          J&apos;ai également occupé le poste de développeur back-end chez
+          Euronews, où j&apos;ai participé à la migration de leur infrastructure
+          vers AWS. J&apos;ai contribué au développement de nouvelles
+          fonctionnalités ainsi qu&apos;à l&apos;amélioration continue des
+          outils internes, notamment le CMS utilisé par les journalistes pour
+          rédiger et publier leurs articles sur le site web d&apos;Euronews.
         </p>
 
         <p>
