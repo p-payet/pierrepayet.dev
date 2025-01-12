@@ -23,8 +23,8 @@ export default async function Home() {
         <p className="text-slate-700 text-lg md:text-xl leading-normal">
           Je suis fasciné par les possibilités qu&apos;offre le développement
           web et j&apos;aime concevoir, réaliser et mettre en place des
-          solutions innovantes, pérennes et personnalisées. Je travaille
-          actuellement avec la Métropole de Lyon.
+          solutions innovantes, pérennes et personnalisées. Actuellement,
+          j&apos;occupe le poste de développeur fullstack chez Inicio.
         </p>
         <Link
           href="/info"
