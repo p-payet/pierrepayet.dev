@@ -60,7 +60,7 @@ export default async function InfoPage() {
         </div>
 
         <Link
-          href="/info/CV_Pierre_Payet_dev_fullstack.pdf"
+          href="/info/CV-Pierre-Payet-dev-fullstack.pdf"
           target="_blank"
           className="group bg-slate-950 hover:bg-slate-800 transition-colors inline-block mt-8 font-mono text-xs font-semibold rounded-full px-8 py-3 text-white"
         >
