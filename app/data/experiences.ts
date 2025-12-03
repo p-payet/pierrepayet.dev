@@ -5,6 +5,7 @@ const experiences: Array<ExperienceProps> = [
     company: 'Inicio',
     role: 'Développeur FullStack - CDI',
     startDate: '2025-01-06',
+    endDate: '2025-12-04',
     logo: '/info/inicio-logo.jpg',
   },
   {
