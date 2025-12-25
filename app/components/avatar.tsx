@@ -1,7 +1,7 @@
 import Image from 'next/image';
 
 interface Props {
-  status: 'available' | 'busy' | 'unavailable';
+  status?: 'available' | 'busy' | 'unavailable';
 }
 
 export function Avatar({ status }: Props) {
@@ -17,21 +17,24 @@ export function Avatar({ status }: Props) {
             height={303}
           />
         </div>
-        <span
-          className={`bottom-0 left-[90px] md:left-28 absolute w-[22px] h-[22px] border-2 border-white dark:border-gray-800 rounded-full ${
-            status === 'available'
+        {status && (
+          <span
+            className={`bottom-0 left-[90px] md:left-28 absolute w-[22px] h-[22px] border-2 border-white dark:border-gray-800 rounded-full ${status === 'available'
               ? 'bg-green-400'
               : status === 'busy'
-              ? 'bg-orange-400'
-              : 'bg-red-400'
-          }`}
-        ></span>
+                ? 'bg-orange-400'
+                : 'bg-red-400'
+              }`}
+          ></span>
+        )}
       </div>
-      <p className="block content-end font-light text-slate-500 text-sm">
-        {status === 'available' && 'Disponible.'}
-        {status === 'busy' && 'Ouvert à de nouvelles opportunités.'}
-        {status === 'unavailable' && 'Non disponible.'}
-      </p>
+      {status && (
+        <p className="block content-end font-light text-slate-500 text-sm">
+          {status === 'available' && 'Disponible.'}
+          {status === 'busy' && 'Ouvert à de nouvelles opportunités.'}
+          {status === 'unavailable' && 'Non disponible.'}
+        </p>
+      )}
     </div>
   );
 }

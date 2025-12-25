@@ -13,11 +13,11 @@ export default async function Home() {
   return (
     <main className="grid gap-14 pb-14 px-4 md:px-0">
       <section className="pb-14 border-b border-slate-300">
-        <Avatar status="unavailable" />
+        <Avatar />
         <h1 className="font-semibold text-4xl mb-5 text-slate-950">
-          Salut, je suis Pierre. 👋
+          Salut, je suis Pierre 👋
           <span className="block text-slate-500 font-normal text-2xl mt-2">
-            Développeur TypeScript - Node.js, basé à Lyon.
+            Développeur Fullstack TypeScript / Node.js, basé à Lyon.
           </span>
         </h1>
         <p className="text-slate-700 text-lg md:text-xl leading-normal">
