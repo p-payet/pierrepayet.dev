@@ -1,0 +1,5 @@
+packages:
+  - .
+strictDepBuilds: true
+minimumReleaseAge: 10080 # 7 days
+trustPolicy: no-downgrade
