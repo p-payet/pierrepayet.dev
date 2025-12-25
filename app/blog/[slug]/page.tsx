@@ -1,7 +1,6 @@
 import { Metadata, ResolvingMetadata } from 'next';
 import { notFound } from 'next/navigation';
 import { MDXRemote } from 'next-mdx-remote/rsc';
-import { Pluggable } from 'unified';
 import '@/app/assets/github-dark.css';
 import remarkGfm from 'remark-gfm';
 import rehypeHighlight from 'rehype-highlight';
@@ -89,7 +88,7 @@ export default async function Post({ params }: { params: Params }) {
             options={{
               mdxOptions: {
                 remarkPlugins: [remarkGfm],
-                rehypePlugins: [[rehypeHighlight]] as unknown as Pluggable[],
+                rehypePlugins: [rehypeHighlight],
               },
             }}
           />
