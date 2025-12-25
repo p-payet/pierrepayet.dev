@@ -19,13 +19,13 @@ const JetBrainsMonoFont = JetBrains_Mono({
   subsets: ['latin'],
 });
 
-const title = 'Pierre Payet - Développeur TypeScript / Node.js';
+const title = 'Pierre Payet - Développeur Fullstack TypeScript / Node.js';
 const websiteUrl = 'https://pierrepayet.dev';
 
 export const metadata: Metadata = {
   title,
   description:
-    "Pierre Payet - développeur TypeScript / Node.js. J'aime concevoir des applications web, avec un fort engagement envers la qualité du code. J'apprécie le développement front-end autant que le back-end.",
+    "Pierre Payet - développeur Fullstack TypeScript / Node.js. J'aime concevoir des applications web, avec un fort engagement envers la qualité du code. J'apprécie le développement front-end autant que le back-end.",
   twitter: {
     card: 'summary_large_image',
     images: ['/og.png'],
@@ -52,7 +52,7 @@ const jsonLd = {
   name: 'Pierre Payet',
   image: `${websiteUrl}/pierre-payet.jpg`,
   url: websiteUrl,
-  jobTitle: 'Développeur TypeScript / Node.js',
+  jobTitle: 'Développeur Fullstack TypeScript / Node.js',
   sameAs: [
     'https://github.com/p-payet',
     'https://www.linkedin.com/in/pierre-payet-457476136',
@@ -63,23 +63,23 @@ const menuItems: Array<{
   title: string;
   href: string;
 }> = [
-  {
-    title: 'Accueil',
-    href: '/',
-  },
-  {
-    title: 'Information',
-    href: '/info',
-  },
-  {
-    title: 'Blog',
-    href: '/blog',
-  },
-  {
-    title: 'Contact',
-    href: '/contact',
-  },
-];
+    {
+      title: 'Accueil',
+      href: '/',
+    },
+    {
+      title: 'Information',
+      href: '/info',
+    },
+    {
+      title: 'Blog',
+      href: '/blog',
+    },
+    {
+      title: 'Contact',
+      href: '/contact',
+    },
+  ];
 
 export default function RootLayout({
   children,
