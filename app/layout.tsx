@@ -3,7 +3,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import localFont from 'next/font/local';
 import { JetBrains_Mono } from 'next/font/google';
-import { Analytics } from '@vercel/analytics/react';
+import { Analytics } from '@vercel/analytics/next';
 import clsx from 'clsx';
 import { Navbar } from '@/app/components/navbar';
 import { MobileNavbar } from '@/app/components/mobile-navbar';
