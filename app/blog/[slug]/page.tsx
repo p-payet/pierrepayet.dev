@@ -15,6 +15,12 @@ import {
   SearchInput,
 } from '@/app/components/posts/2024-06-27-debouncing-an-input-in-react';
 
+// Custom img component with lazy loading to prevent preload warnings
+function MDXImage({ src, alt, ...props }: { src?: string; alt?: string;[key: string]: unknown }) {
+  // eslint-disable-next-line @next/next/no-img-element
+  return <img loading="lazy" src={src} alt={alt ?? ''} {...props} />;
+}
+
 export async function generateStaticParams() {
   const paths = getAllPostPaths();
 
@@ -78,6 +84,7 @@ export default async function Post(props: { params: Promise<Params> }) {
           <MDXRemote
             source={content}
             components={{
+              img: MDXImage,
               ScrollAnimationDemoOne,
               TextWrapHero,
               TextWrapPrettyVsBalance,
