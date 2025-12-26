@@ -125,7 +125,7 @@ export default function RootLayout({
             </p>
             <p>
               <Link href="https://github.com/alexpate/www" target="_blank">
-                Merci à Alex Pate
+                S/O Alex Pate
               </Link>
             </p>
           </footer>
