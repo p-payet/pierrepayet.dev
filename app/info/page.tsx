@@ -10,19 +10,17 @@ export default async function InfoPage() {
       <PageHeader title="Information" />
       <section className="pb-8 prose prose-lg">
         <p>
-          Je suis actuellement développeur fullstack chez Inicio, où je
-          contribue à la conception et au développement d&apos;une marketplace
-          internationale. Le but visé est d&apos;accélérer la transition
-          énergétique en facilitant le déploiement des énergies vertes, tant en
-          France qu&apos;à l&apos;international.
+          En tant que développeur fullstack chez Inicio, startup parisienne au service de la transition énergétique,
+          j&apos;ai pris part à la conception et au développement d&apos;une plateforme SaaS pensée pour
+          les développeurs d&apos;énergies renouvelables. Un projet concret visant à faciliter l&apos;essor
+          du solaire en France et à l&apos;international.
         </p>
 
         <p>
-          Auparavant, j&apos;ai exercé en tant que développeur web freelance
-          pour la Métropole de Lyon. Au sein d&apos;une équipe dynamique,
-          j&apos;ai contribué à l&apos;ajout de nouvelles fonctionnalités et à
-          l&apos;amélioration continue d&apos;une plateforme utilisée par
-          plusieurs centaines de milliers d&apos;utilisateurs.
+          Avant cela, j&apos;ai travaillé en freelance pour la Métropole de Lyon, au sein d&apos;une équipe dédiée à
+          un Espace Numérique de Travail (ENT) destiné aux collèges et écoles de la région. J&apos;ai contribué au
+          développement de nouvelles fonctionnalités et à l&apos;amélioration continue de la plateforme
+          utilisée par plusieurs centaines de milliers d&apos;utilisateurs.
         </p>
 
         <p>

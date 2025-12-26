@@ -15,16 +15,15 @@ export default async function Home() {
       <section className="pb-14 border-b border-slate-300">
         <Avatar />
         <h1 className="font-semibold text-4xl mb-5 text-slate-950">
-          Salut, je suis Pierre 👋
+          Salut, moi c&apos;est Pierre 👋
           <span className="block text-slate-500 font-normal text-2xl mt-2">
             Développeur Fullstack TypeScript / Node.js, basé à Lyon.
           </span>
         </h1>
         <p className="text-slate-700 text-lg md:text-xl leading-normal">
-          Je suis fasciné par les possibilités qu&apos;offre le développement
-          web et j&apos;aime concevoir, réaliser et mettre en place des
-          solutions innovantes, pérennes et personnalisées. Actuellement,
-          j&apos;occupe le poste de développeur fullstack chez Inicio.
+          Le développement web, c&apos;est bien plus que du code, c&apos;est donner vie à des idées.
+          Je conçois des solutions sur-mesure, robustes et évolutives, en plaçant toujours les besoins métier
+          au cœur de chaque décision technique.
         </p>
         <Link
           href="/info"
