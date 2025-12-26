@@ -21,10 +21,8 @@ export async function generateStaticParams() {
   return paths;
 }
 
-export async function generateMetadata(
-  { params }: { params: { slug: string } },
-  parent: ResolvingMetadata
-): Promise<Metadata> {
+export async function generateMetadata(props: { params: Promise<{ slug: string }> }, parent: ResolvingMetadata): Promise<Metadata> {
+  const params = await props.params;
   const post = getPostBySlug(params.slug);
 
   const parentMeta = await parent;
@@ -47,7 +45,8 @@ type Params = {
   slug: string;
 };
 
-export default async function Post({ params }: { params: Params }) {
+export default async function Post(props: { params: Promise<Params> }) {
+  const params = await props.params;
   const post = getPostBySlug(params.slug);
 
   if (!post) return notFound();
