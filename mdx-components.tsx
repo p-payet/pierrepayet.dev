@@ -2,6 +2,12 @@ import type { MDXRemoteProps } from 'next-mdx-remote/rsc';
 
 type MDXComponents = MDXRemoteProps['components'];
 
+// Custom img component with lazy loading to prevent preload warnings
+function MDXImage({ src, alt, ...props }: { src?: string; alt?: string;[key: string]: unknown }) {
+  // eslint-disable-next-line @next/next/no-img-element
+  return <img loading="lazy" src={src} alt={alt ?? ''} {...props} />;
+}
+
 // This file allows you to provide custom React components
 // to be used in MDX files. You can import and use any
 // React component you want, including components from
@@ -12,8 +18,7 @@ export function useMDXComponents(
   components: MDXComponents
 ): MDXComponents {
   return {
-    // Allows customizing built-in components, e.g. to add styling.
-    // h1: ({ children }) => <h1 style={{ fontSize: "100px" }}>{children}</h1>,
+    img: MDXImage,
     ...components,
   };
 }
