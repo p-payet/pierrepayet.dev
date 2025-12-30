@@ -18,6 +18,7 @@ const JetBrainsMonoFont = JetBrains_Mono({
   display: 'swap',
   variable: '--font-monospace',
   subsets: ['latin'],
+  preload: false,
 });
 
 const title = 'Pierre Payet - Développeur Fullstack TypeScript / Node.js';
