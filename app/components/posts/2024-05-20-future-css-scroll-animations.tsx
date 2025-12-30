@@ -42,7 +42,7 @@ export function ScrollAnimationDemoOne() {
           styles.scrollContainer
         )}
       >
-        <div className="w-full h-[1200px] bg-gradient-to-b from-stone-100 to-stone-400 flex justify-center items-top">
+        <div className="w-full h-[1200px] bg-linear-to-b from-stone-100 to-stone-400 flex justify-center items-top">
           <span className="block mt-24 font-medium text-sm">Scroll down</span>
         </div>
       </div>

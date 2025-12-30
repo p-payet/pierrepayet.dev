@@ -8,8 +8,8 @@ export function TextWrapHero({ variant }: { variant?: 'balance' | 'pretty' }) {
       </span>
       <span
         className={clsx('text-xl text-slate-700 max-w-md text-center', {
-          '[text-wrap:balance]': variant === 'balance',
-          '[text-wrap:pretty]': variant === 'pretty',
+          'text-balance': variant === 'balance',
+          'text-pretty': variant === 'pretty',
         })}
       >
         And this is my subheading text which is a little bit longer
@@ -33,7 +33,7 @@ export function TextWrapPrettyVsBalance() {
         <span className="text-base font-medium text-slate-900">
           text-wrap: pretty
         </span>
-        <span className="text-base text-slate-700 max-w-md [text-wrap:pretty]">
+        <span className="text-base text-slate-700 max-w-md text-pretty">
           {text}
         </span>
       </div>
@@ -42,7 +42,7 @@ export function TextWrapPrettyVsBalance() {
           text-wrap: balance
         </span>
 
-        <span className="text-base text-slate-700 max-w-md [text-wrap:balance]">
+        <span className="text-base text-slate-700 max-w-md text-balance">
           {text}
         </span>
       </div>

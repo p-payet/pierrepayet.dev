@@ -58,8 +58,8 @@ export function MobileNavbar({ menuItems }: Props) {
           type="checkbox"
           id="mobile-menu"
         />
-        <div className="relative z-50 block h-[1px] w-7 bg-transparent before:absolute before:top-[-0.35rem] before:z-50 before:block before:h-full before:w-full before:bg-black before:transition-all before:duration-200 before:ease-out after:absolute after:right-0 after:bottom-[-0.35rem] after:block after:h-full after:w-full after:bg-black after:transition-all after:duration-200 after:ease-out peer-checked:bg-transparent before:peer-checked:top-0 before:peer-checked:w-full before:peer-checked:rotate-45 before:peer-checked:transform after:peer-checked:bottom-0 after:peer-checked:w-full after:peer-checked:-rotate-45 after:peer-checked:transform"></div>
-        <div className="fixed inset-0 z-40 hidden h-full w-full bg-black/50 backdrop-blur-sm peer-checked:block"></div>
+        <div className="relative z-50 block h-px w-7 bg-transparent before:absolute before:top-[-0.35rem] before:z-50 before:block before:h-full before:w-full before:bg-black before:transition-all before:duration-200 before:ease-out after:absolute after:right-0 after:bottom-[-0.35rem] after:block after:h-full after:w-full after:bg-black after:transition-all after:duration-200 after:ease-out peer-checked:bg-transparent peer-checked:before:top-0 peer-checked:before:w-full peer-checked:before:rotate-45 peer-checked:before:transform peer-checked:after:bottom-0 peer-checked:after:w-full peer-checked:after:-rotate-45 peer-checked:after:transform"></div>
+        <div className="fixed inset-0 z-40 hidden h-full w-full bg-black/50 backdrop-blur-xs peer-checked:block"></div>
         <div className="fixed top-0 right-0 z-40 h-full w-full translate-x-full overflow-y-auto overscroll-y-none transition duration-500 peer-checked:translate-x-0">
           <nav className="float-right min-h-full w-[85%] bg-white px-6 pt-12 shadow-2xl">
             <ul className="mt-5">

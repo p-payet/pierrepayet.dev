@@ -8,7 +8,7 @@ export function Avatar({ status }: Props) {
   return (
     <div className="flex gap-4 md:gap-0 mb-5">
       <div className="relative">
-        <div className="ring-gray-400 ring-offset-base-100 w-28 md:w-36 rounded-full ring ring-offset-2">
+        <div className="ring-gray-400 ring-offset-base-100 w-28 md:w-36 rounded-full ring-3 ring-offset-2">
           <Image
             className="w-28 h-28 md:w-36 md:h-36 rounded-full"
             src="/pierre-payet.jpg"
