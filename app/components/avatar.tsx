@@ -15,6 +15,7 @@ export function Avatar({ status }: Props) {
             alt="Pierre Payet"
             width={303}
             height={303}
+            loading="eager"
           />
         </div>
         {status && (
