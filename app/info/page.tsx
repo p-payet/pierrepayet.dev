@@ -1,4 +1,3 @@
-import Link from 'next/link';
 import experiences from '@/app/data/experiences';
 import { PageHeader } from '@/app/components/page-header';
 import { Title } from '@/app/components/title';
@@ -57,16 +56,17 @@ export default async function InfoPage() {
           ))}
         </div>
 
-        <Link
+        <a
           href="/info/CV-Pierre-Payet-dev-fullstack.pdf"
           target="_blank"
+          rel="noopener noreferrer"
           className="group bg-slate-950 hover:bg-slate-800 transition-colors inline-block mt-8 font-mono text-xs font-semibold rounded-full px-8 py-3 text-white"
         >
           Voir mon CV détaillé{' '}
           <span className="inline-block group-hover:translate-x-2 transition-transform">
             →
           </span>
-        </Link>
+        </a>
       </section>
     </main>
   );
