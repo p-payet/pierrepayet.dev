@@ -1,7 +1,4 @@
-'use client';
-
 import Image from 'next/image';
-import { useState, useEffect } from 'react';
 import dayjs from 'dayjs';
 import { dayjsExt } from '@/lib/dayjs-extend';
 
@@ -24,39 +21,30 @@ export function Experience({
   endDate,
   logo,
 }: ExperienceProps) {
-  const [diffResult, setDiffResult] = useState('');
-  const [formattedEndDate, setFormattedEndDate] = useState('');
-
-  useEffect(() => {
-    const dayjsStartDate = dayjsExt(startDate);
-    const dayjsEndDate = endDate ? dayjsExt(endDate) : dayjsExt();
-
-    const endDateFormatted = dayjsEndDate.isSame(dayjsExt(), 'month')
-      ? "Aujourd'hui"
-      : formatDate(dayjsEndDate);
-    setFormattedEndDate(endDateFormatted);
-
-    const diff = dayjsExt.duration(dayjsEndDate.diff(dayjsStartDate));
-    let diffYears = diff.years();
-    // Add one month to compensate dayjs's duration strange calculation
-    let diffMonths = diff.months() + 1;
-
-    if (diffMonths === 12) {
-      diffYears++;
-      diffMonths = 0;
-    }
-
-    const result = [
-      diffYears > 0 ? `${diffYears} an${diffYears >= 2 ? 's' : ''}` : '',
-      diffMonths > 0 ? `${diffMonths} mois` : '',
-    ]
-      .filter(Boolean)
-      .join(' et ');
-
-    setDiffResult(result);
-  }, [startDate, endDate]);
+  const dayjsStartDate = dayjsExt(startDate);
+  const dayjsEndDate = endDate ? dayjsExt(endDate) : dayjsExt();
 
   const formattedStartDate = formatDate(dayjsExt(startDate));
+  const formattedEndDate = dayjsEndDate.isSame(dayjsExt(), 'month')
+    ? "Aujourd'hui"
+    : formatDate(dayjsEndDate);
+
+  const diff = dayjsExt.duration(dayjsEndDate.diff(dayjsStartDate));
+  let diffYears = diff.years();
+  // Add one month to compensate dayjs's duration strange calculation
+  let diffMonths = diff.months() + 1;
+
+  if (diffMonths === 12) {
+    diffYears++;
+    diffMonths = 0;
+  }
+
+  const diffResult = [
+    diffYears > 0 ? `${diffYears} an${diffYears >= 2 ? 's' : ''}` : '',
+    diffMonths > 0 ? `${diffMonths} mois` : '',
+  ]
+    .filter(Boolean)
+    .join(' et ');
 
   return (
     <div className="flex gap-4 py-6" key={company}>
