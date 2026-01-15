@@ -98,28 +98,22 @@ export const getPostBySlug = cache((slug: string, isWork?: boolean): Post | null
  * @returns An array of all posts, sorted by date in descending order.
  */
 export const getAllPosts = cache(async ({
-  includeDrafts,
-  filePath,
+  includeDrafts = false,
   isWork,
 }: {
   includeDrafts?: boolean;
-  filePath?: string;
   isWork?: boolean;
 }): Promise<Post[]> => {
   const files = fs.readdirSync(path.join(isWork ? WORK_PATH : POSTS_PATH));
 
-  const posts: Post[] = files
-    .map((item) => getPostFromFile(item, isWork))
-    .filter((post): post is Post => post !== null);
-
-  const filteredAndSortedPosts = posts.sort((a, b) => {
-    if (new Date(a.date) > new Date(b.date)) {
-      return -1;
-    }
-    return 1;
-  });
-
-  return filteredAndSortedPosts;
+  return files
+    .map(item => getPostFromFile(item, isWork))
+    .filter((post): post is Post => {
+      if (!post) return false;
+      if (!includeDrafts && post.meta?.draft) return false;
+      return true;
+    })
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 });
 
 /**
