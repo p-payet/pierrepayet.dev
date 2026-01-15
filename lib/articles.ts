@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import { cache } from 'react';
 import matter from 'gray-matter';
 
 interface Post {
@@ -77,7 +78,7 @@ const getPostFromFile = (filename: string, isWork?: boolean): Post | null => {
  * @param slug - The slug of the post to get.
  * @returns The post with the given slug, or null if no such post exists.
  */
-export const getPostBySlug = (slug: string, isWork?: boolean): Post | null => {
+export const getPostBySlug = cache((slug: string, isWork?: boolean): Post | null => {
   const files = fs.readdirSync(path.join(isWork ? WORK_PATH : POSTS_PATH));
 
   for (const filename of files) {
@@ -90,13 +91,13 @@ export const getPostBySlug = (slug: string, isWork?: boolean): Post | null => {
   }
 
   return null;
-};
+});
 
 /**
  * Gets all posts.
  * @returns An array of all posts, sorted by date in descending order.
  */
-export const getAllPosts = async ({
+export const getAllPosts = cache(async ({
   includeDrafts,
   filePath,
   isWork,
@@ -119,7 +120,7 @@ export const getAllPosts = async ({
   });
 
   return filteredAndSortedPosts;
-};
+});
 
 /**
  * Generates an array of all the paths for the posts.
