@@ -1,19 +1,29 @@
 import { Metadata, ResolvingMetadata } from 'next';
+import dynamic from 'next/dynamic';
 import { notFound } from 'next/navigation';
 import { MDXRemote } from 'next-mdx-remote/rsc';
 import '@/app/assets/github-dark.css';
 import remarkGfm from 'remark-gfm';
 import rehypeHighlight from 'rehype-highlight';
 import { getAllPostPaths, getPostBySlug } from '@/lib/articles';
-import { ScrollAnimationDemoOne } from '@/app/components/posts/2024-05-20-future-css-scroll-animations';
-import {
-  TextWrapHero,
-  TextWrapPrettyVsBalance,
-} from '@/app/components/posts/2024-05-21-future-css-text-wrap-pretty';
-import {
-  DebouncedSearchInput,
-  SearchInput,
-} from '@/app/components/posts/2024-06-27-debouncing-an-input-in-react';
+import { ScrollAnimationDemoOne } from '@/app/components/posts/scroll-animation-wrapper';
+
+const TextWrapHero = dynamic(
+  () => import('@/app/components/posts/2024-05-21-future-css-text-wrap-pretty')
+    .then(mod => mod.TextWrapHero)
+);
+const TextWrapPrettyVsBalance = dynamic(
+  () => import('@/app/components/posts/2024-05-21-future-css-text-wrap-pretty')
+    .then(mod => mod.TextWrapPrettyVsBalance)
+);
+const DebouncedSearchInput = dynamic(
+  () => import('@/app/components/posts/2024-06-27-debouncing-an-input-in-react')
+    .then(mod => mod.DebouncedSearchInput)
+);
+const SearchInput = dynamic(
+  () => import('@/app/components/posts/2024-06-27-debouncing-an-input-in-react')
+    .then(mod => mod.SearchInput)
+);
 
 // Custom img component with lazy loading to prevent preload warnings
 function MDXImage({ src, alt, ...props }: { src?: string; alt?: string;[key: string]: unknown }) {
