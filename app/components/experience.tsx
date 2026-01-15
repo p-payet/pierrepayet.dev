@@ -54,6 +54,7 @@ export function Experience({
         src={logo}
         alt={`${company} logo`}
         className="w-14 h-14 rounded-xl"
+        loading="lazy"
       />
       <div className="flex flex-col col-span-9">
         <span className="text-slate-800 text-xl font-semibold">{company}</span>
