@@ -9,7 +9,11 @@ interface Props {
   href: string;
 }
 
+const dateFormatter = new Intl.DateTimeFormat('fr-FR', { dateStyle: 'medium' });
+
 export const ArticleLink: FC<Props> = ({ title, date, summary, href }) => {
+  const formattedDate = dateFormatter.format(new Date(date));
+
   return (
     <Link href={href} className="flex flex-col gap-4 py-8 first:pt-0">
       <div className="flex flex-col">
@@ -19,9 +23,7 @@ export const ArticleLink: FC<Props> = ({ title, date, summary, href }) => {
         <span className="text-slate-500 text-sm tracking-tight font-mono block mt-2">
           Publié le{' '}
           <time dateTime={date}>
-            {new Intl.DateTimeFormat('fr-FR', {
-              dateStyle: 'medium',
-            }).format(new Date(date))}
+            {formattedDate}
           </time>
         </span>
 
