@@ -18,7 +18,7 @@ export function Avatar({ status }: Props) {
             loading="eager"
           />
         </div>
-        {status && (
+        {status ? (
           <span
             className={`bottom-0 left-[90px] md:left-28 absolute w-[22px] h-[22px] border-2 border-white dark:border-gray-800 rounded-full ${status === 'available'
               ? 'bg-green-400'
@@ -27,15 +27,15 @@ export function Avatar({ status }: Props) {
                 : 'bg-red-400'
               }`}
           ></span>
-        )}
+        ) : null}
       </div>
-      {status && (
+      {status ? (
         <p className="block content-end font-light text-slate-500 text-sm">
           {status === 'available' && 'Disponible.'}
           {status === 'busy' && 'Ouvert à de nouvelles opportunités.'}
           {status === 'unavailable' && 'Non disponible.'}
         </p>
-      )}
+      ) : null}
     </div>
   );
 }
