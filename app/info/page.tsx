@@ -38,7 +38,19 @@ export default async function InfoPage() {
         </p>
       </section>
 
-      <section className="pb-16">
+      <a
+        href="/info/CV-Pierre-Payet-dev-fullstack-typescript-nodejs.pdf"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="group bg-slate-950 hover:bg-slate-800 transition-colors inline-block font-mono text-xs font-semibold rounded-full px-8 py-3 text-white"
+      >
+        Voir mon CV{' '}
+        <span className="inline-block group-hover:translate-x-2 transition-transform">
+          →
+        </span>
+      </a>
+
+      <section className="pt-5 pb-16">
         <Title as="h2" variant="secondary" className="mb-4 mt-8">
           Expériences
         </Title>
@@ -55,18 +67,6 @@ export default async function InfoPage() {
             />
           ))}
         </div>
-
-        <a
-          href="/info/CV-Pierre-Payet-dev-fullstack.pdf"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="group bg-slate-950 hover:bg-slate-800 transition-colors inline-block mt-8 font-mono text-xs font-semibold rounded-full px-8 py-3 text-white"
-        >
-          Voir mon CV détaillé{' '}
-          <span className="inline-block group-hover:translate-x-2 transition-transform">
-            →
-          </span>
-        </a>
       </section>
     </main>
   );
