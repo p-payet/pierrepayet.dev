@@ -39,7 +39,8 @@
     "description": "Vous pouvez me joindre en utilisant l'un de ces moyens de contact."
   },
   "blog": {
-    "title": "Articles"
+    "title": "Articles",
+    "languageNotice": "Certains articles sont rédigés uniquement en français ou en anglais. Les traductions arrivent bientôt."
   },
   "footer": {
     "viewSource": "Voir le code source",
