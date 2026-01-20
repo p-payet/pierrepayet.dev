@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useTranslations, useLocale } from 'next-intl';
+import { LanguageSwitcher } from './language-switcher';
 
 export function Navbar() {
   const t = useTranslations('navigation');
@@ -21,7 +22,7 @@ export function Navbar() {
           {menuItems[0].title}
         </h1>
       </Link>
-      <nav className="flex gap-6">
+      <nav className="flex items-center gap-6">
         {menuItems.slice(1).map((menuItem) => {
           return (
             <Link
@@ -33,6 +34,7 @@ export function Navbar() {
             </Link>
           );
         })}
+        <LanguageSwitcher />
       </nav>
     </header>
   );
