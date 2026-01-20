@@ -1,13 +1,19 @@
+'use client';
+
 import Link from 'next/link';
+import { useTranslations, useLocale } from 'next-intl';
 
-interface Props {
-  menuItems: Array<{
-    title: string;
-    href: string;
-  }>;
-}
+export function Navbar() {
+  const t = useTranslations('navigation');
+  const locale = useLocale();
 
-export function Navbar({ menuItems }: Props) {
+  const menuItems = [
+    { title: t('home'), href: `/${locale}` },
+    { title: t('info'), href: `/${locale}/info` },
+    { title: t('blog'), href: `/${locale}/blog` },
+    { title: t('contact'), href: `/${locale}/contact` },
+  ];
+
   return (
     <header className="pt-8 md:pt-16 pb-16 px-4 md:px-0 justify-between hidden sm:flex">
       <Link href={menuItems[0].href}>

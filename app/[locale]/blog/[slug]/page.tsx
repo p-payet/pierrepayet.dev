@@ -2,42 +2,69 @@ import { Metadata, ResolvingMetadata } from 'next';
 import dynamic from 'next/dynamic';
 import { notFound } from 'next/navigation';
 import { MDXRemote } from 'next-mdx-remote/rsc';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 import '@/app/assets/github-dark.css';
 import remarkGfm from 'remark-gfm';
 import rehypeHighlight from 'rehype-highlight';
 import { getAllPostPaths, getPostBySlug } from '@/lib/articles';
 import { ScrollAnimationDemoOne } from '@/app/components/posts/scroll-animation-wrapper';
+import { routing } from '@/i18n/routing';
 
 const TextWrapHero = dynamic(
-  () => import('@/app/components/posts/2024-05-21-future-css-text-wrap-pretty')
-    .then(mod => mod.TextWrapHero)
+  () =>
+    import('@/app/components/posts/2024-05-21-future-css-text-wrap-pretty').then(
+      (mod) => mod.TextWrapHero
+    )
 );
 const TextWrapPrettyVsBalance = dynamic(
-  () => import('@/app/components/posts/2024-05-21-future-css-text-wrap-pretty')
-    .then(mod => mod.TextWrapPrettyVsBalance)
+  () =>
+    import('@/app/components/posts/2024-05-21-future-css-text-wrap-pretty').then(
+      (mod) => mod.TextWrapPrettyVsBalance
+    )
 );
 const DebouncedSearchInput = dynamic(
-  () => import('@/app/components/posts/2024-06-27-debouncing-an-input-in-react')
-    .then(mod => mod.DebouncedSearchInput)
+  () =>
+    import(
+      '@/app/components/posts/2024-06-27-debouncing-an-input-in-react'
+    ).then((mod) => mod.DebouncedSearchInput)
 );
 const SearchInput = dynamic(
-  () => import('@/app/components/posts/2024-06-27-debouncing-an-input-in-react')
-    .then(mod => mod.SearchInput)
+  () =>
+    import(
+      '@/app/components/posts/2024-06-27-debouncing-an-input-in-react'
+    ).then((mod) => mod.SearchInput)
 );
 
 // Custom img component with lazy loading to prevent preload warnings
-function MDXImage({ src, alt, ...props }: { src?: string; alt?: string;[key: string]: unknown }) {
+function MDXImage({
+  src,
+  alt,
+  ...props
+}: {
+  src?: string;
+  alt?: string;
+  [key: string]: unknown;
+}) {
   // eslint-disable-next-line @next/next/no-img-element
   return <img loading="lazy" src={src} alt={alt ?? ''} {...props} />;
 }
 
 export async function generateStaticParams() {
-  const paths = getAllPostPaths();
+  const paths = await getAllPostPaths();
 
-  return paths;
+  // Generate params for all locales and all posts
+  return routing.locales.flatMap((locale) =>
+    paths.map((path) => ({
+      locale,
+      slug: path.slug,
+    }))
+  );
 }
 
-export async function generateMetadata(props: { params: Promise<{ slug: string }> }, parent: ResolvingMetadata): Promise<Metadata> {
+export async function generateMetadata(
+  props: { params: Promise<{ locale: string; slug: string }> },
+  parent: ResolvingMetadata
+): Promise<Metadata> {
   const params = await props.params;
   const post = getPostBySlug(params.slug);
 
@@ -52,18 +79,24 @@ export async function generateMetadata(props: { params: Promise<{ slug: string }
       ...parentMeta?.openGraph,
       title: post?.meta?.title || parentMeta?.openGraph?.title,
       description: post?.meta?.summary || parentMeta?.openGraph?.description,
-      url: `https://pierrepayet.dev/blog/${params.slug}`,
+      url: `https://pierrepayet.dev/${params.locale}/blog/${params.slug}`,
     },
   };
 }
 
 type Params = {
+  locale: string;
   slug: string;
 };
 
 export default async function Post(props: { params: Promise<Params> }) {
   const params = await props.params;
-  const post = getPostBySlug(params.slug);
+  const { locale, slug } = params;
+
+  setRequestLocale(locale);
+
+  const t = await getTranslations('dates');
+  const post = getPostBySlug(slug);
 
   if (!post) return notFound();
 
@@ -73,6 +106,9 @@ export default async function Post(props: { params: Promise<Params> }) {
 
   const { meta, content } = post;
 
+  // Format date based on locale
+  const dateLocale = locale === 'fr' ? 'fr-FR' : 'en-US';
+
   return (
     <main className="px-4 md:px-0">
       <section>
@@ -80,9 +116,9 @@ export default async function Post(props: { params: Promise<Params> }) {
           {meta.title}
         </h1>
         <span className="text-slate-500 text-sm tracking-tight font-mono block mt-4">
-          Publié le{' '}
+          {t('publishedOn')}{' '}
           <time dateTime={post.date}>
-            {new Intl.DateTimeFormat('fr-FR', {
+            {new Intl.DateTimeFormat(dateLocale, {
               dateStyle: 'medium',
             }).format(new Date(post.date))}
           </time>

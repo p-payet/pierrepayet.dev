@@ -1,17 +1,24 @@
 import Link from 'next/link';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 import contacts from '@/app/data/contacts';
 import { PageHeader } from '@/app/components/page-header';
 import { Title } from '@/app/components/title';
 
-export default async function InfoPage() {
+type Props = {
+  params: Promise<{ locale: string }>;
+};
+
+export default async function ContactPage({ params }: Props) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+
+  const t = await getTranslations('contact');
+
   return (
     <main className="px-4 md:px-0">
-      <PageHeader title="Contact" />
+      <PageHeader title={t('title')} />
       <section className="pb-8">
-        <p className="text-lg mb-4">
-          Vous pouvez me joindre en utilisant l&apos;un de ces moyens de
-          contact.
-        </p>
+        <p className="text-lg mb-4">{t('description')}</p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {contacts.map((contact) => {

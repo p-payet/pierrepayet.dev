@@ -2,16 +2,19 @@
 
 import Link from 'next/link';
 import { useEffect, useRef, useCallback } from 'react';
+import { useTranslations, useLocale } from 'next-intl';
 
-interface Props {
-  menuItems: Array<{
-    title: string;
-    href: string;
-  }>;
-}
-
-export function MobileNavbar({ menuItems }: Props) {
+export function MobileNavbar() {
   const checkboxRef = useRef<HTMLInputElement>(null);
+  const t = useTranslations('navigation');
+  const locale = useLocale();
+
+  const menuItems = [
+    { title: t('home'), href: `/${locale}` },
+    { title: t('info'), href: `/${locale}/info` },
+    { title: t('blog'), href: `/${locale}/blog` },
+    { title: t('contact'), href: `/${locale}/contact` },
+  ];
 
   const handleLinkClick = useCallback(() => {
     if (checkboxRef.current) {
