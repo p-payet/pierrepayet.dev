@@ -1,20 +1,19 @@
 'use client';
 
-import Link from 'next/link';
 import { useEffect, useRef, useCallback } from 'react';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
+import { Link } from '@/i18n/navigation';
 import { LanguageSwitcher } from './language-switcher';
 
 export function MobileNavbar() {
   const checkboxRef = useRef<HTMLInputElement>(null);
   const t = useTranslations('navigation');
-  const locale = useLocale();
 
   const menuItems = [
-    { title: t('home'), href: `/${locale}` },
-    { title: t('info'), href: `/${locale}/info` },
-    { title: t('blog'), href: `/${locale}/blog` },
-    { title: t('contact'), href: `/${locale}/contact` },
+    { title: t('home'), href: '/' },
+    { title: t('info'), href: '/info' },
+    { title: t('blog'), href: '/blog' },
+    { title: t('contact'), href: '/contact' },
   ];
 
   const handleLinkClick = useCallback(() => {
