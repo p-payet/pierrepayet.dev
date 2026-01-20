@@ -1,0 +1,27 @@
+{
+  "navigation": {
+    "home": "Home",
+    "info": "Info",
+    "blog": "Blog",
+    "contact": "Contact"
+  },
+  "home": {
+    "greeting": "Hi, I'm Pierre",
+    "subtitle": "Fullstack TypeScript / Node.js Developer, based in Lyon.",
+    "intro": "Web development has been my passion for over 10 years. I love building modern and performant web applications.",
+    "moreInfo": "More information",
+    "latestArticles": "Latest articles",
+    "viewMoreArticles": "View more articles",
+    "latestLinkedIn": "Latest LinkedIn posts"
+  },
+  "footer": {
+    "viewSource": "View source code"
+  },
+  "dates": {
+    "publishedOn": "Published on",
+    "today": "Today",
+    "years": "{count, plural, =1 {# year} other {# years}}",
+    "months": "{count, plural, =1 {# month} other {# months}}",
+    "and": "and"
+  }
+}

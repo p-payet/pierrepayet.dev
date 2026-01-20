@@ -1,0 +1,27 @@
+{
+  "navigation": {
+    "home": "Accueil",
+    "info": "Information",
+    "blog": "Blog",
+    "contact": "Contact"
+  },
+  "home": {
+    "greeting": "Salut, moi c'est Pierre",
+    "subtitle": "Développeur Fullstack TypeScript / Node.js, basé à Lyon.",
+    "intro": "Le développement web est ma passion depuis plus de 10 ans. J'aime créer des applications web modernes et performantes.",
+    "moreInfo": "Plus d'information",
+    "latestArticles": "Derniers articles",
+    "viewMoreArticles": "Voir plus d'articles",
+    "latestLinkedIn": "Derniers posts LinkedIn"
+  },
+  "footer": {
+    "viewSource": "Voir le code source"
+  },
+  "dates": {
+    "publishedOn": "Publié le",
+    "today": "Aujourd'hui",
+    "years": "{count, plural, =1 {# an} other {# ans}}",
+    "months": "{count} mois",
+    "and": "et"
+  }
+}
