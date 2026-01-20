@@ -6,22 +6,46 @@
     "contact": "Contact"
   },
   "home": {
-    "greeting": "Salut, moi c'est Pierre",
+    "greeting": "Salut, moi c'est Pierre 👋",
     "subtitle": "Développeur Fullstack TypeScript / Node.js, basé à Lyon.",
-    "intro": "Le développement web est ma passion depuis plus de 10 ans. J'aime créer des applications web modernes et performantes.",
+    "intro": "Le développement web, c'est bien plus que du code, c'est donner vie à des idées. Je conçois des solutions sur-mesure, robustes et évolutives, en plaçant toujours les besoins métier au cœur de chaque décision technique.",
     "moreInfo": "Plus d'information",
     "latestArticles": "Derniers articles",
     "viewMoreArticles": "Voir plus d'articles",
     "latestLinkedIn": "Derniers posts LinkedIn"
   },
+  "info": {
+    "title": "Information",
+    "paragraph1": "En tant que développeur fullstack chez Inicio, startup parisienne au service de la transition énergétique, j'ai pris part à la conception et au développement d'une plateforme SaaS pensée pour les développeurs d'énergies renouvelables. Un projet concret visant à faciliter l'essor du solaire en France et à l'international.",
+    "paragraph2": "Avant cela, j'ai travaillé en freelance pour la Métropole de Lyon, au sein d'une équipe dédiée à un Espace Numérique de Travail (ENT) destiné aux collèges et écoles de la région. J'ai contribué au développement de nouvelles fonctionnalités et à l'amélioration continue de la plateforme utilisée par plusieurs centaines de milliers d'utilisateurs.",
+    "paragraph3": "J'ai également occupé le poste de développeur back-end chez Euronews, où j'ai participé à la migration de leur infrastructure vers AWS. J'ai contribué au développement de nouvelles fonctionnalités ainsi qu'à l'amélioration continue des outils internes, notamment le CMS utilisé par les journalistes pour rédiger et publier leurs articles sur le site web d'Euronews.",
+    "paragraph4": "À côté de cela, j'ai effectué plusieurs petites missions freelance de développement web. J'aime également développer mes propres projets.",
+    "viewCV": "Voir mon CV",
+    "experiences": "Expériences"
+  },
+  "contact": {
+    "title": "Contact",
+    "description": "Vous pouvez me joindre en utilisant l'un de ces moyens de contact."
+  },
+  "blog": {
+    "title": "Articles"
+  },
   "footer": {
-    "viewSource": "Voir le code source"
+    "viewSource": "Voir le code source",
+    "shoutout": "S/O Alex Pate"
   },
   "dates": {
     "publishedOn": "Publié le",
     "today": "Aujourd'hui",
-    "years": "{count, plural, =1 {# an} other {# ans}}",
+    "year": "{count} an",
+    "years": "{count} ans",
+    "month": "{count} mois",
     "months": "{count} mois",
     "and": "et"
+  },
+  "metadata": {
+    "title": "Pierre Payet - Développeur Fullstack TypeScript / Node.js",
+    "description": "Pierre Payet - développeur Fullstack TypeScript / Node.js. J'aime concevoir des applications web, avec un fort engagement envers la qualité du code. J'apprécie le développement front-end autant que le back-end.",
+    "jobTitle": "Développeur Fullstack TypeScript / Node.js"
   }
 }
