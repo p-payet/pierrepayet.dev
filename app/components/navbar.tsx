@@ -16,7 +16,7 @@ export function Navbar() {
 
   return (
     <header className="pt-8 md:pt-16 pb-16 px-4 md:px-0 justify-between hidden sm:flex">
-      <Link href={menuItems[0].href}>
+      <Link href={menuItems[0].href} className="content-center">
         <h1 className="text-base font-mono font-semibold text-slate-950">
           {menuItems[0].title}
         </h1>

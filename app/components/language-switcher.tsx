@@ -10,54 +10,57 @@ const localeLabels: Record<Locale, { flag: string; label: string }> = {
 };
 
 interface LanguageSwitcherProps {
-  /** Display mode: 'compact' shows only flag, 'full' shows flag + label */
-  mode?: 'compact' | 'full';
   /** Additional CSS classes */
   className?: string;
 }
 
-export function LanguageSwitcher({
-  mode = 'compact',
-  className = '',
-}: LanguageSwitcherProps) {
-  const locale = useLocale() as Locale;
+export function LanguageSwitcher({ className = '' }: LanguageSwitcherProps) {
+  const currentLocale = useLocale() as Locale;
   const router = useRouter();
   const pathname = usePathname();
 
   const handleLocaleChange = (newLocale: Locale) => {
-    if (newLocale !== locale) {
+    if (newLocale !== currentLocale) {
       router.replace(pathname, { locale: newLocale });
     }
   };
 
-  // Get the other locale to switch to
-  const otherLocale = locales.find((l) => l !== locale) as Locale;
-  const otherLocaleInfo = localeLabels[otherLocale];
-
   return (
-    <button
-      type="button"
-      onClick={() => handleLocaleChange(otherLocale)}
-      className={`
-        inline-flex items-center gap-1.5
-        px-2 py-1
-        rounded-md
-        text-sm font-mono font-semibold
-        text-slate-700
-        hover:bg-slate-100
-        transition-colors duration-200
-        cursor-pointer
-        ${className}
-      `}
-      aria-label={`Switch to ${otherLocaleInfo.label}`}
-      title={`Switch to ${otherLocaleInfo.label}`}
+    <div
+      className={`inline-flex items-center gap-0.5 rounded-md bg-slate-100 p-0.5 ${className}`}
+      role="group"
+      aria-label="Language selection"
     >
-      <span className="text-base" role="img" aria-hidden="true">
-        {otherLocaleInfo.flag}
-      </span>
-      {mode === 'full' && (
-        <span className="text-slate-950">{otherLocaleInfo.label}</span>
-      )}
-    </button>
+      {locales.map((locale) => {
+        const isActive = locale === currentLocale;
+        const { flag, label } = localeLabels[locale];
+
+        return (
+          <button
+            key={locale}
+            type="button"
+            onClick={() => handleLocaleChange(locale)}
+            className={`
+              px-2 py-1
+              rounded
+              text-base
+              transition-all duration-200
+              cursor-pointer
+              ${isActive
+                ? 'bg-white shadow-sm'
+                : 'opacity-50 hover:opacity-80 hover:bg-slate-50'
+              }
+            `}
+            aria-label={label}
+            aria-pressed={isActive}
+            title={label}
+          >
+            <span role="img" aria-hidden="true">
+              {flag}
+            </span>
+          </button>
+        );
+      })}
+    </div>
   );
 }
