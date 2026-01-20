@@ -15,6 +15,7 @@ export default async function Home({ params }: Props) {
   setRequestLocale(locale);
 
   const t = await getTranslations('home');
+  const tLinkedin = await getTranslations('linkedinPosts');
   const posts = await getAllPosts({
     includeDrafts: process.env.NODE_ENV === 'development',
   });
@@ -79,13 +80,13 @@ export default async function Home({ params }: Props) {
         <ul className="list-disc pl-4">
           {linkedinPosts.slice(0, 3).map((linkedinPost) => {
             return (
-              <li key={linkedinPost.title}>
+              <li key={linkedinPost.titleKey}>
                 <Link
                   href={linkedinPost.href}
                   target="_blank"
                   className="underline"
                 >
-                  {linkedinPost.title}
+                  {tLinkedin(linkedinPost.titleKey)}
                 </Link>
               </li>
             );

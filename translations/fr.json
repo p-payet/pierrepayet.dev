@@ -14,6 +14,10 @@
     "viewMoreArticles": "Voir plus d'articles",
     "latestLinkedIn": "Derniers posts LinkedIn"
   },
+  "linkedinPosts": {
+    "superMalter": "De \"Super Malter\" à une nouvelle aventure chez Inicio.",
+    "gildedRose": "Publication de l'article sur le kata Gilded Rose."
+  },
   "info": {
     "title": "Information",
     "paragraph1": "En tant que développeur fullstack chez Inicio, startup parisienne au service de la transition énergétique, j'ai pris part à la conception et au développement d'une plateforme SaaS pensée pour les développeurs d'énergies renouvelables. Un projet concret visant à faciliter l'essor du solaire en France et à l'international.",
