@@ -1,6 +1,6 @@
-import { ExperienceProps } from '@/app/components/experience';
+import { ExperienceData } from '@/app/components/experience';
 
-const experiences: Array<ExperienceProps> = [
+const experiences: Array<ExperienceData> = [
   {
     company: 'Inicio',
     role: 'Développeur FullStack - CDI',

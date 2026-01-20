@@ -56,6 +56,7 @@ export default async function Home({ params }: Props) {
                 title={post.meta.title}
                 date={post?.date}
                 summary={post.meta.summary}
+                locale={locale}
               />
             );
           })}

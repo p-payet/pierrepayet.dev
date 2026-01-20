@@ -1,8 +1,14 @@
 import Image from 'next/image';
 import dayjs from 'dayjs';
-import { dayjsExt } from '@/lib/dayjs-extend';
+import 'dayjs/locale/fr';
+import 'dayjs/locale/en';
+import duration from 'dayjs/plugin/duration';
+import { getTranslations } from 'next-intl/server';
 
-export interface ExperienceProps {
+dayjs.extend(duration);
+
+// Data type for experience records (without locale)
+export interface ExperienceData {
   company: string;
   role: string;
   startDate: string;
@@ -10,26 +16,39 @@ export interface ExperienceProps {
   logo: string;
 }
 
+// Component props include locale for translations
+export interface ExperienceProps extends ExperienceData {
+  locale: string;
+}
+
 const formatDate = (date: dayjs.Dayjs) =>
   date.format('MMMM YYYY').charAt(0).toUpperCase() +
   date.format('MMMM YYYY').slice(1);
 
-export function Experience({
+export async function Experience({
   company,
   role,
   startDate,
   endDate,
   logo,
+  locale,
 }: ExperienceProps) {
-  const dayjsStartDate = dayjsExt(startDate);
-  const dayjsEndDate = endDate ? dayjsExt(endDate) : dayjsExt();
+  const t = await getTranslations('dates');
 
-  const formattedStartDate = formatDate(dayjsExt(startDate));
-  const formattedEndDate = dayjsEndDate.isSame(dayjsExt(), 'month')
-    ? "Aujourd'hui"
+  // Set dayjs locale based on current locale
+  const dayjsLocale = locale === 'fr' ? 'fr' : 'en';
+
+  const dayjsStartDate = dayjs(startDate).locale(dayjsLocale);
+  const dayjsEndDate = endDate
+    ? dayjs(endDate).locale(dayjsLocale)
+    : dayjs().locale(dayjsLocale);
+
+  const formattedStartDate = formatDate(dayjsStartDate);
+  const formattedEndDate = dayjsEndDate.isSame(dayjs(), 'month')
+    ? t('today')
     : formatDate(dayjsEndDate);
 
-  const diff = dayjsExt.duration(dayjsEndDate.diff(dayjsStartDate));
+  const diff = dayjs.duration(dayjsEndDate.diff(dayjsStartDate));
   let diffYears = diff.years();
   // Add one month to compensate dayjs's duration strange calculation
   let diffMonths = diff.months() + 1;
@@ -40,11 +59,15 @@ export function Experience({
   }
 
   const diffResult = [
-    diffYears > 0 ? `${diffYears} an${diffYears >= 2 ? 's' : ''}` : '',
-    diffMonths > 0 ? `${diffMonths} mois` : '',
+    diffYears > 0
+      ? t(diffYears >= 2 ? 'years' : 'year', { count: diffYears })
+      : '',
+    diffMonths > 0
+      ? t(diffMonths >= 2 ? 'months' : 'month', { count: diffMonths })
+      : '',
   ]
     .filter(Boolean)
-    .join(' et ');
+    .join(` ${t('and')} `);
 
   return (
     <div className="flex gap-4 py-6" key={company}>

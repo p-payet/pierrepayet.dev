@@ -50,6 +50,7 @@ export default async function InfoPage({ params }: Props) {
               startDate={experience.startDate}
               endDate={experience.endDate}
               logo={experience.logo}
+              locale={locale}
             />
           ))}
         </div>

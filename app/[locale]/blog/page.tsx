@@ -28,6 +28,7 @@ export default async function Page({ params }: Props) {
               title={post.meta.title}
               summary={post.meta.summary}
               date={post.date}
+              locale={locale}
             />
           );
         })}
