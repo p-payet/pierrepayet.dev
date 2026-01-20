@@ -46,7 +46,7 @@ export default async function InfoPage({ params }: Props) {
             <Experience
               key={experience.company}
               company={experience.company}
-              role={experience.role}
+              roleKey={experience.roleKey}
               startDate={experience.startDate}
               endDate={experience.endDate}
               logo={experience.logo}

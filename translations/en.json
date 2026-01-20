@@ -23,6 +23,13 @@
     "viewCV": "View my CV",
     "experiences": "Experience"
   },
+  "experience": {
+    "inicio": "FullStack Software Developer - Permanent",
+    "metropoleDeLyon": "Web Developer - Freelance",
+    "euronews": "Back-End Web Developer - Work-study then Fixed-term",
+    "synergiesTech": "Software Designer / Developer - Work-study",
+    "orange": "IT Systems Manager - Internship then Temp"
+  },
   "contact": {
     "title": "Contact",
     "description": "You can reach me using one of these contact methods."

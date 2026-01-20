@@ -23,6 +23,13 @@
     "viewCV": "Voir mon CV",
     "experiences": "Expériences"
   },
+  "experience": {
+    "inicio": "Développeur FullStack - CDI",
+    "metropoleDeLyon": "Développeur Web - Freelance",
+    "euronews": "Développeur Web Back-End - Alternant puis CDD",
+    "synergiesTech": "Concepteur / Développeur Informatique - Alternant",
+    "orange": "Responsable Systèmes d'Informations - Stage puis Interim"
+  },
   "contact": {
     "title": "Contact",
     "description": "Vous pouvez me joindre en utilisant l'un de ces moyens de contact."

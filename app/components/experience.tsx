@@ -10,7 +10,7 @@ dayjs.extend(duration);
 // Data type for experience records (without locale)
 export interface ExperienceData {
   company: string;
-  role: string;
+  roleKey: string;
   startDate: string;
   endDate?: string;
   logo: string;
@@ -27,13 +27,14 @@ const formatDate = (date: dayjs.Dayjs) =>
 
 export async function Experience({
   company,
-  role,
+  roleKey,
   startDate,
   endDate,
   logo,
   locale,
 }: ExperienceProps) {
   const t = await getTranslations('dates');
+  const tExperience = await getTranslations('experience');
 
   // Set dayjs locale based on current locale
   const dayjsLocale = locale === 'fr' ? 'fr' : 'en';
@@ -81,7 +82,7 @@ export async function Experience({
       />
       <div className="flex flex-col col-span-9">
         <span className="text-slate-800 text-xl font-semibold">{company}</span>
-        <span className="text-slate-700 text-lg">{role}</span>
+        <span className="text-slate-700 text-lg">{tExperience(roleKey)}</span>
         <span className="block mt-4 text-slate-500 col-span-2 text-sm font-medium tracking-tighter font-mono">
           {formattedStartDate} → {formattedEndDate} - {diffResult}
         </span>
