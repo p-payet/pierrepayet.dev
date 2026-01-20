@@ -14,6 +14,8 @@ export default async function InfoPage({ params }: Props) {
 
   const t = await getTranslations('info');
 
+  const cvFileName = locale === 'fr' ? 'CV-Pierre-Payet-dev-fullstack-typescript-nodejs-FR.pdf' : 'CV-Pierre-Payet-dev-fullstack-typescript-nodejs-EN.pdf';
+
   return (
     <main className="px-4 md:px-0">
       <PageHeader title={t('title')} />
@@ -25,7 +27,7 @@ export default async function InfoPage({ params }: Props) {
       </section>
 
       <a
-        href="/info/CV-Pierre-Payet-dev-fullstack-typescript-nodejs.pdf"
+        href={`/info/${cvFileName}`}
         target="_blank"
         rel="noopener noreferrer"
         className="group bg-slate-950 hover:bg-slate-800 transition-colors inline-block font-mono text-xs font-semibold rounded-full px-8 py-3 text-white"
