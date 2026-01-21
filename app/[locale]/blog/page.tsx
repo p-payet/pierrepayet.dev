@@ -21,9 +21,6 @@ export default async function Page({ params }: Props) {
   return (
     <main className="px-4 md:px-0">
       <PageHeader title={t('title')} />
-      <p className="mb-6 text-sm text-zinc-500 dark:text-zinc-400 italic">
-        {t('languageNotice')}
-      </p>
       <section className="divide-y">
         {posts.map((post) => {
           return (

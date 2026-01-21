@@ -39,8 +39,7 @@
     "description": "You can reach me using one of these contact methods."
   },
   "blog": {
-    "title": "Articles",
-    "languageNotice": "Some articles are written only in French or English. Translations are coming soon."
+    "title": "Articles"
   },
   "footer": {
     "viewSource": "View source code",
