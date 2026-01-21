@@ -1,0 +1,78 @@
+---
+title: 'HackTheBox - [WEB] Emdee five for life'
+summary: "Commençons un deuxième challenge web sur HTB, celui-ci s'appelle Emdee five for life.
+Il ne vaut que 20 points également, donc ça devrait être facile..."
+---
+
+Commençons un deuxième challenge web sur HTB, celui-ci s'appelle Emdee five for life.
+Il ne vaut que 20 points également, donc ça devrait être facile...
+
+La seule description que nous avons avant de lancer l'instance du challenge est :
+
+> Can you encrypt fast enough?
+
+Après avoir démarré l'instance du challenge, nous arrivons sur cette page web :
+
+![page web](/blog/hackthebox-web-emdee-five-for-life/webpage-1.png)
+
+La page web nous fournit une chaîne de caractères, et l'objectif est d'envoyer le hash MD5 de cette chaîne.
+
+Facile, allons sur ce site pour chiffrer la chaîne : https://md5decrypt.net/.
+
+Ok, nous savons maintenant que le hash MD5 de **mKLopMuyMYtWvvflbpNi est 8eb5f6b4e268fcb945adae6e5b07947e**,
+validons donc le challenge !
+
+![page web 2](/blog/hackthebox-web-emdee-five-for-life/webpage-2.png)
+
+Aïe ! C'était trop facile pour être vrai, la page web nous indique que nous étions trop lents et nous donne une nouvelle chaîne à chiffrer.
+
+Voyons ce qui se passe quand on clique sur le bouton **Submit** avec **BurpSuite** :
+
+![BurpSuite](/blog/hackthebox-web-emdee-five-for-life/burp-1.png)
+
+Une requête POST avec les données "hash=notrehash" est envoyée, et nous pouvons voir que la requête POST contient un
+header Cookie **PHPSESSID=tgr5iis70c01731l6h9o1masr7**.
+
+Maintenant que nous avons ces informations, nous pouvons créer un script Python qui enverra la requête POST avec le hash MD5 de
+la chaîne sans oublier le cookie.
+
+```python
+import requests, hashlib
+from bs4 import BeautifulSoup
+
+url = "http://docker.hackthebox.eu:30966"
+
+s = requests.session()
+response = s.get(url)
+
+soup = BeautifulSoup(response.content, "lxml")
+
+str = soup.h3.string
+hash = hashlib.md5(str.encode()).hexdigest()
+
+myobj = {'hash': hash}
+
+flag = s.post(url, data = myobj)
+
+print(flag.text)
+```
+
+J'utilise **requests.session()** pour utiliser le cookie dans la requête POST, j'utilise également la bibliothèque Python **BeautifulSoup**
+qui permet de récupérer le HTML de la page web. Ensuite j'utilise **hashlib** qui permet de chiffrer la chaîne en MD5.
+Et finalement j'envoie la requête POST et j'affiche la réponse du serveur qui contient le flag.
+
+N'oubliez pas d'ajouter les droits d'exécution au script Python :
+
+```shell
+chmod +x md5_chall.py
+```
+
+Et exécutons-le :
+
+```shell
+python md5_chall.py
+```
+
+![résultat terminal](/blog/hackthebox-web-emdee-five-for-life/bingo-2.png)
+
+BINGO ! Le flag est dans la réponse HTML !

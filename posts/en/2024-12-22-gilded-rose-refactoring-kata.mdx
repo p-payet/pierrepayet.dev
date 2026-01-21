@@ -1,0 +1,328 @@
+---
+title: 'Gilded Rose Refactoring Kata - TypeScript Solution'
+summary: 'Step-by-step explanation of the solving method for the "Gilded Rose" kata.'
+---
+
+**Link to my TypeScript solution: https://github.com/p-payet/gilded-rose-refactoring-kata.**
+
+The "Gilded Rose" refactoring kata is a programming exercise aimed at introducing
+a new feature into legacy code while improving its structure and maintainability.
+
+The kata is available on this GitHub repository: https://github.com/emilybache/GildedRose-Refactoring-Kata.
+
+Note that I retrieved the **js-jest** project from the repository and made modifications
+to add TypeScript to the project.
+
+And here is the link to the kata requirements: https://github.com/emilybache/GildedRose-Refactoring-Kata/blob/main/GildedRoseRequirements.md.
+
+After reading the requirements, it might be tempting to immediately start
+implementing the requested new feature. However, this would be a serious mistake.
+Indeed, the code we inherit has no tests, and it seems to have been written in a disorganized manner,
+making it difficult to understand at first glance.
+
+Any modification, even the smallest one, to the code could cause unexpected regressions.
+It is therefore essential to ensure the code works correctly using tests.
+However, in our case, no tests are present, and writing all the tests needed
+to verify that the code meets the expected specifications would be far too time-consuming.
+
+### Table of Contents:
+1. [First step: setting up "Approval Testing"](#first-step)
+2. [Second step: simple refactoring using the P42 extension](#second-step)
+3. [Third step: in-depth refactoring using the "Conditional Decomposition" method](#third-step)
+4. [Fourth step: replacing conditions with polymorphism](#fourth-step)
+5. [Fifth step: adding the new feature](#fifth-step)
+6. [Sixth step: writing missing specification tests](#sixth-step)
+
+---
+
+<a name="first-step"></a>
+### First step: setting up "Approval Testing"
+
+Fortunately, there is a technique that allows modifications
+to code without tests: **"Approval Testing"**, sometimes called **"Golden Master"**.
+
+The principle of this method is simple: we write a minimal test to capture the current result of the code.
+This result is then saved as a **"snapshot"**, which becomes our reference.
+Each time the code is modified, we run the Approval Testing.
+If the obtained result differs from our reference snapshot, then the test fails.
+
+This technique allows us to refactor the code with confidence, providing a guarantee that the changes
+made will not break the current behavior of the code, as long as the Approval Testing remains valid.
+
+To do this, we will create a new file **gilded_rose.approval.test.ts** in the **test** directory of the project:
+
+```TypeScript
+import { describe, it, expect } from '@jest/globals';
+import {
+    Item,
+    Shop,
+} from "../src/gilded_rose";
+import {
+    agedBrieItemFactory,
+    backstagePassesItemFactory,
+    conjuredItemFactory,
+    normalItemFactory,
+    sulfurasItemFactory,
+} from './gilded_rose.spec.test';
+
+const runSimulation = (items: Array<Item>, days: number): string => {
+    const shop = new Shop(items);
+    let output = "";
+
+    for (let day = 0; day <= days; day++) {
+      output += `-------- day ${day} --------\n`;
+      output += "name, sellIn, quality\n";
+      items.forEach(item => output += `${item.name}, ${item.sellIn}, ${item.quality}\n`);
+      shop.decreaseSellIn();
+      output += "\n";
+    }
+
+    return output;
+}
+
+describe("Gilded Rose Shop Approval Testing", () => {
+    // Approval Testing (a.k.a: Golden Master)
+    it("should match snapshot", () => {
+      const items = [
+        normalItemFactory(10, 20),
+        agedBrieItemFactory(2, 0),
+        normalItemFactory(5, 7),
+        sulfurasItemFactory(0, 80),
+        sulfurasItemFactory(-1, 80),
+        backstagePassesItemFactory(15, 20),
+        backstagePassesItemFactory(10, 49),
+        backstagePassesItemFactory(5, 49),
+        conjuredItemFactory(3, 6),
+      ];
+      const output = runSimulation(items, 30);
+
+      expect(output).toMatchSnapshot();
+    });
+});
+```
+
+We use Jest's **toMatchSnapshot()** method to perform our Approval Testing.
+To learn more about how this method works: https://jestjs.io/docs/snapshot-testing.
+
+---
+
+<a name="second-step"></a>
+### Second step: simple refactoring using the P42 extension
+
+**P42 JS Assistant** is a **VS Code** extension that analyzes code and provides refactoring suggestions.
+
+Link to the extension's GitHub repository: https://github.com/p42ai/js-assistant.
+
+Here are some examples of refactoring done with P42:
+
+> Converting a **for** loop to a **for...of** loop:
+>
+> ```TypeScript
+> for (let i = 0; i < this.items.length; i++) {
+>   ...
+> }
+> ```
+>
+> ```TypeScript
+> for (const item of this.items) {
+>   ...
+> }
+> ```
+
+> Merging nested **if** conditions:
+>
+> ```TypeScript
+> if (item.quality > 0) {
+>   if (item.name != "Sulfuras, Hand of Ragnaros") {
+>     ...
+>   }
+> }
+> ```
+>
+> ```TypeScript
+> if (item.quality > 0 && item.name != "Sulfuras, Hand of Ragnaros") {
+>   ...
+> }
+> ``
+> ```
+
+> Converting an assignment to a decrement:
+>
+> ```TypeScript
+> item.quality = item.quality - 1;
+> ```
+>
+> ```TypeScript
+> item.quality--;
+> ```
+
+These are simple refactorings, but they help to rough out and perform an initial simplification of the code.
+
+In our case, all **P42** suggestions can be applied.
+After each modification, don't forget to run our Approval Testing to verify
+that our code's behavior remains unchanged.
+
+**Note:** P42 is just a tool, you should not blindly apply all suggestions.
+It is necessary to understand each modification made to the code.
+
+---
+
+<a name="third-step"></a>
+### Third step: in-depth refactoring using the "Conditional Decomposition" method
+
+By analyzing the code, we notice that it contains many nested **if** conditions,
+many of which check the value of the **item.name** property.
+
+Here are the different values of **item.name** currently handled:
+
+- "Aged Brie"
+- "Backstage passes to a TAFKAL80ETC concert"
+- "Sulfuras, Hand of Ragnaros"
+- Any other value
+
+To improve readability and make the code easier to maintain, it is desirable to extract the logic
+specific to each of these cases into distinct methods.
+This allows us to respect the **Single Responsibility Principle** (SRP), by assigning each method a
+single well-defined responsibility.
+
+An effective refactoring technique consists of temporarily duplicating the block containing the nested
+**if** conditions. We can then encapsulate the first block in a condition checking the first value of
+**item.name**, and place the duplicated block in an else. This process can be repeated to progressively isolate
+the logic of each case into dedicated methods.
+
+```TypeScript
+if (item.name === "Aged Brie") {
+  ... // duplicated code
+} else {
+  ... // duplicated code
+}
+```
+
+Now we just need to replace all conditions checking the value of **item.name** with
+expressions returning directly **true** or **false**.
+For example:
+
+```TypeScript
+if (
+  item.name != "Aged Brie" &&
+  item.name != "Backstage passes to a TAFKAL80ETC concert"
+) {
+  if (item.quality > 0 && item.name != "Sulfuras, Hand of Ragnaros") {
+    item.quality--;
+  }
+}
+```
+
+becomes:
+
+```TypeScript
+if (false && true) {
+  if (item.quality > 0 && true) {
+    item.quality--;
+  }
+}
+```
+
+Thus, only the code applied when **item.name** equals **"Aged Brie"** will remain.
+This code can then be extracted into a dedicated method, which we will name **updateAgedBrieQuality()**.
+
+```TypeScript
+updateAgedBrieQuality(item) {
+  if (item.quality < 50) {
+    item.quality++;
+  }
+
+  item.sellIn--;
+
+  if (item.sellIn < 0 && item.quality < 50) {
+    item.quality++;
+  }
+}
+```
+
+Once all our methods are extracted, the **updateQuality()** method boils down to a **switch** that calls the
+corresponding methods based on the value of **item.name**.
+
+```TypeScript
+switch (item.name) {
+  case "Aged Brie": {
+    ...
+  } case "Backstage passes to a TAFKAL80ETC concert": {
+    ...
+  } case "Sulfuras, Hand of Ragnaros" : {
+    ...
+  } default: {
+    ...
+  }
+}
+```
+
+---
+
+<a name="fourth-step"></a>
+### Fourth step: replacing conditions with polymorphism
+
+Using a switch in the **updateQuality()** method of the **Shop** class can be an indicator that it is
+time to leverage polymorphism. Indeed, when a method performs different actions based on
+the value of a property, it often reveals a suboptimal code structure.
+
+To improve this structure, we will implement polymorphism. This will involve creating specialized subclasses,
+inheriting from a parent class with an **updateQuality()** method, which each subclass can
+override according to its specific needs.
+
+```TypeScript
+class NormalItem() {
+  updateQuality() {
+    ...
+  }
+}
+
+class AgedBrie() extends NormalItem {
+  override updateQuality() {
+    ...
+  }
+}
+
+class Sulfuras() extends NormalItem {
+  override updateQuality() {
+    ...
+  }
+}
+
+class BackstagePasses() extends NormalItem {
+  override updateQuality() {
+    ...
+  }
+}
+```
+
+---
+
+<a name="fifth-step"></a>
+### Fifth step: adding the new feature
+
+Now, with clear and well-structured code, we can integrate the requested new feature:
+adding a **Conjured item**.
+
+For this, we will adopt the **Test-Driven Development** (TDD) method, which will guide us in implementing this
+new **item** progressively and reliably.
+
+I won't detail this step here, but if you want to better understand the concept of TDD,
+I highly recommend this blog article: https://blog.ippon.fr/2021/02/05/ca-cest-tdd.
+
+Adding this new feature will break our **Approval Testing**.
+It is therefore necessary to update the **snapshot** with the following command:
+
+```bash
+jest --updateSnapshot
+```
+
+---
+
+<a name="sixth-step"></a>
+### Sixth step: writing missing specification tests
+
+Finally, it is important to write all the specification tests that might be missing to ensure
+the stability and reliability of the code.
+
+**As a reminder, you can access my TypeScript solution here: https://github.com/p-payet/gilded-rose-refactoring-kata.**

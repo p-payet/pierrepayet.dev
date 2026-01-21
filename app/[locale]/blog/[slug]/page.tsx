@@ -9,6 +9,7 @@ import rehypeHighlight from 'rehype-highlight';
 import { getAllPostPaths, getPostBySlug } from '@/lib/articles';
 import { ScrollAnimationDemoOne } from '@/app/components/posts/scroll-animation-wrapper';
 import { routing } from '@/i18n/routing';
+import { type Locale } from '@/i18n/config';
 
 const TextWrapHero = dynamic(
   () =>
@@ -50,23 +51,26 @@ function MDXImage({
 }
 
 export async function generateStaticParams() {
-  const paths = await getAllPostPaths();
-
-  // Generate params for all locales and all posts
-  return routing.locales.flatMap((locale) =>
-    paths.map((path) => ({
-      locale,
-      slug: path.slug,
-    }))
+  // Generate params for all locales and all posts in each locale
+  const allParams = await Promise.all(
+    routing.locales.map(async (locale) => {
+      const paths = await getAllPostPaths(locale as Locale);
+      return paths.map((path) => ({
+        locale,
+        slug: path.slug,
+      }));
+    })
   );
+
+  return allParams.flat();
 }
 
 export async function generateMetadata(
-  props: { params: Promise<{ locale: string; slug: string }> },
+  props: { params: Promise<{ locale: Locale; slug: string }> },
   parent: ResolvingMetadata
 ): Promise<Metadata> {
   const params = await props.params;
-  const post = getPostBySlug(params.slug);
+  const post = getPostBySlug(params.slug, params.locale);
 
   const parentMeta = await parent;
 
@@ -85,7 +89,7 @@ export async function generateMetadata(
 }
 
 type Params = {
-  locale: string;
+  locale: Locale;
   slug: string;
 };
 
@@ -96,7 +100,7 @@ export default async function Post(props: { params: Promise<Params> }) {
   setRequestLocale(locale);
 
   const t = await getTranslations('dates');
-  const post = getPostBySlug(slug);
+  const post = getPostBySlug(slug, locale);
 
   if (!post) return notFound();
 

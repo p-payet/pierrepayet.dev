@@ -5,9 +5,10 @@ import { getAllPosts } from '@/lib/articles';
 import { ArticleLink } from '@/app/components/article-link';
 import { Title } from '@/app/components/title';
 import { Avatar } from '@/app/components/avatar';
+import { type Locale } from '@/i18n/config';
 
 type Props = {
-  params: Promise<{ locale: string }>;
+  params: Promise<{ locale: Locale }>;
 };
 
 export default async function Home({ params }: Props) {
@@ -18,6 +19,7 @@ export default async function Home({ params }: Props) {
   const tLinkedin = await getTranslations('linkedinPosts');
   const posts = await getAllPosts({
     includeDrafts: process.env.NODE_ENV === 'development',
+    locale,
   });
 
   return (

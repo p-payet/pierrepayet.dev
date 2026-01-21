@@ -2,9 +2,10 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { getAllPosts } from '@/lib/articles';
 import { PageHeader } from '@/app/components/page-header';
 import { ArticleLink } from '@/app/components/article-link';
+import { type Locale } from '@/i18n/config';
 
 type Props = {
-  params: Promise<{ locale: string }>;
+  params: Promise<{ locale: Locale }>;
 };
 
 export default async function Page({ params }: Props) {
@@ -14,6 +15,7 @@ export default async function Page({ params }: Props) {
   const t = await getTranslations('blog');
   const posts = await getAllPosts({
     includeDrafts: process.env.NODE_ENV === 'development',
+    locale,
   });
 
   return (

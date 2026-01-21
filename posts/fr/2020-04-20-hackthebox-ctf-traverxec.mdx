@@ -1,0 +1,149 @@
+---
+title: 'HackTheBox - [CTF] Traverxec'
+summary: "Commençons un autre CTF sur HackTheBox, le nom de la machine est Traverxec et elle est classée en difficulté facile."
+---
+
+![banner](/blog/hackthebox-ctf-traverxec/banner.png)
+
+Commençons un autre CTF sur HackTheBox, le nom de la machine est Traverxec et elle est classée en difficulté facile.
+
+Avant de commencer quoi que ce soit, nous pouvons déjà deviner quel type d'exploit nous allons rencontrer juste par le nom de la machine.
+Traver rappelle l'exploit Directory Traversal, et xec rappelle l'exécution de commande... voyons si c'est correct.
+
+Tout d'abord, énumérons les ports ouverts sur la machine avec nmap :
+
+![nmap](/blog/hackthebox-ctf-traverxec/nmap.png)
+
+Nous pouvons voir que la machine exécute un serveur nostromo 1.9.6 sur le port 80, intéressant...
+
+![port 80 access](/blog/hackthebox-ctf-traverxec/access.png)
+
+Avec une simple recherche Google, nous pouvons trouver un exploit pour cette version de nostromo :
+[Nostromo 1.9.6 Directory Traversal / Remote Command Execution](https://packetstormsecurity.com/files/155045/Nostromo-1.9.6-Directory-Traversal-Remote-Command-Execution.html),
+il semble que nous ayons bien deviné le type d'exploit.
+
+Nous pouvons vérifier que le serveur est vulnérable à cet exploit en ajoutant simplement **/.%0D./.%0D./.%0D./.%0D./** à l'URL :
+
+![traversal](/blog/hackthebox-ctf-traverxec/traversal.png)
+
+OUI ! Nous pouvons accéder au répertoire / du serveur.
+Maintenant, exécutons [ce module d'exploit metasploit](https://packetstormsecurity.com/files/155045/Nostromo-1.9.6-Directory-Traversal-Remote-Command-Execution.html) pour obtenir facilement un shell :
+
+![shell metasploit](/blog/hackthebox-ctf-traverxec/shell-metasploit.png)
+
+Nous avons maintenant un shell avec l'utilisateur www-data, le prochain objectif est d'obtenir un shell avec un vrai utilisateur système.
+
+En parcourant les différents répertoires, un en particulier semble intéressant : **/var/nostromo/conf**.
+Ce répertoire contient le fichier de configuration nostromo : **nhttpd.conf**. Voyons ce qu'il y a à l'intérieur :
+
+![nhttpd conf](/blog/hackthebox-ctf-traverxec/nhttpd-conf.png)
+
+Faisons une recherche rapide sur Google pour la page man de nostromo afin de mieux comprendre ce fichier de configuration.
+[La voici](http://www.nazgul.ch/dev/nostromo_man.html).
+
+Il semble donc y avoir un fichier htpasswd à cet emplacement : **/var/nostromo/conf/.htpasswd**. Affichons-le :
+
+![cat htpasswd file](/blog/hackthebox-ctf-traverxec/cat-htpasswd.png)
+
+Un hash de mot de passe pour l'utilisateur david, intéressant ! Utilisons **JohnTheRipper** pour le craquer :
+
+![johntheripper](/blog/hackthebox-ctf-traverxec/johntheripper.png)
+
+Wow c'était rapide, le mot de passe trouvé par john est : **Nowonly4me**.
+Nous pouvons maintenant penser que nous avons accès à l'utilisateur david avec ce mot de passe, mais non non non.
+Toutes les tentatives de connexion à david avec su ou ssh ont échoué. Il doit y avoir une raison, relisons la page man du fichier **nhttpd.conf**.
+
+> BASIC AUTHENTICATION
+
+> To ask for basic authentication on certain directories within your
+> docroot you have to create a file in that directory named like set by the
+> htaccess option in your configfile.
+
+Et :
+
+> The list of authorized users and their passwords (DES encrypted) are
+> stored in the file set by the htpasswd option in configfile.
+
+Donc les identifiants que nous venons de craquer ne sont pas pour accéder à l'utilisateur système david,
+mais c'est pour accéder à un certain répertoire sur le serveur web nostromo.
+La page man dit aussi ceci à propos de la partie HOMEDIRS :
+
+> To serve the home directories of your users via HTTP,
+> enable the homedirs option by defining the path in where the home directories are stored, normally /home.
+> To access a users home directory enter a ~ in the URL followed by the home directory name like in this example:
+> http://www.nazgul.ch/~hacki/
+
+Nous apprenons ici que nous pouvons accéder au répertoire home de david avec cette URL : **10.10.10.165/~david/**.
+Il y a aussi une information intéressante dans le fichier de configuration, il y a un homedirs_public défini sur public_www,
+donc il devrait y avoir un répertoire **public_www** dans le répertoire home de david. Voyons :
+
+![www public](/blog/hackthebox-ctf-traverxec/www-public.png)
+
+Exactement ! Nous pouvons voir qu'à l'intérieur il y a un répertoire **protected-file-area**. Essayons d'y accéder avec le navigateur web :
+
+![protcted area](/blog/hackthebox-ctf-traverxec/protected-area.png)
+
+La page nous demande un nom d'utilisateur et un mot de passe, c'est le moment d'utiliser les identifiants que nous avons craqués il y a quelques minutes : **david:Nowonly4me**.
+
+![backup](/blog/hackthebox-ctf-traverxec/backup.png)
+
+Dans ce répertoire protégé il y a un fichier compressé : **backup-ssh-identity-files.tgz**. Téléchargeons-le et décompressons-le :
+
+![extract backup](/blog/hackthebox-ctf-traverxec/extract-backup.png)
+
+Ces fichiers extraits semblent être les clés privée et publique SSH de l'utilisateur david.
+Cela pourrait être utilisé pour se connecter au serveur en SSH avec l'utilisateur david.
+Mais avant de pouvoir l'utiliser, nous devons craquer la passphrase de la clé privée.
+Pour cela, utilisons notre outil de craquage préféré : JohnTheRipper,
+oui il y a un outil john qui permet de craquer les clés privées SSH : **ssh2john**.
+
+```shell
+ssh2john id_rsa > id_rsa.crack
+```
+
+Vous pouvez voir que nous avons converti la clé en un hash craquable puis l'avons entrée dans un fichier texte nommé id_rsa.crack.
+
+Maintenant utilisons John the Ripper pour craquer ce hash.
+
+![crack ssh key](/blog/hackthebox-ctf-traverxec/crack-ssh-key.png)
+
+Génial ! Nous l'avons craqué avec succès ! La passphrase utilisée pour créer la clé privée SSH est : **hunter**.
+Nous pouvons maintenant utiliser la clé privée pour nous connecter en SSH avec l'utilisateur david. Nous pouvons spécifier une clé privée avec la commande ssh :
+
+```shell
+ssh -i id_rsa david@10.10.10.165
+```
+
+![ssh](/blog/hackthebox-ctf-traverxec/ssh.png)
+
+Bingo ! L'utilisateur david est à nous !
+
+Nous devons maintenant faire une **élévation de privilèges** pour obtenir root.
+Nous pouvons voir qu'à l'intérieur de **/home/david/bin** il y a un script intéressant **server-stats.sh**.
+
+![bin](/blog/hackthebox-ctf-traverxec/bin.png)
+
+![cat script](/blog/hackthebox-ctf-traverxec/cat-script.png)
+
+Sur la dernière ligne, nous pouvons voir que le script utilise la commande **sudo** pour afficher les 5 dernières lignes du journal.
+Nous allons utiliser un comportement particulier de Linux pour obtenir un shell avec accès root.
+
+Copions la dernière ligne du script mais sans le **| /usr/bin/cat**, puis collons-la dans un nouveau script sh :
+
+```shell
+echo "/usr/bin/sudo /usr/bin/journalctl -n5 -unostromo.service" > elevation.sh
+```
+
+Ensuite, exécutons le script, mais en minimisant notre fenêtre de terminal.
+
+![elevation](/blog/hackthebox-ctf-traverxec/elevation.png)
+
+Ainsi, toute la sortie du script ne peut pas tenir dans la fenêtre du terminal, et c'est là qu'un comportement particulier se produit.
+Quand la sortie de journalctl ne peut pas tenir dans la fenêtre du terminal, le terminal ouvre la sortie en **Mode Visuel (vi)**.
+La bonne nouvelle pour nous est que nous pouvons obtenir un shell depuis cet état de vi, [voici plus d'explications](https://sanctum.geek.nz/arabesque/shell-from-vi/).
+
+Nous devons juste écrire **!/bin/bash** pour obtenir un shell avec accès root.
+
+![root](/blog/hackthebox-ctf-traverxec/root.png)
+
+BINGO ! Machine rootée !

@@ -1,0 +1,87 @@
+---
+title: 'HackTheBox - [WEB] Grammar'
+summary: "Prêt pour un nouveau défi ? Attaquons celui nommé Grammar, cette fois c'est un challenge à 70 points."
+---
+
+Prêt pour un nouveau défi ? Attaquons celui nommé Grammar, cette fois c'est un challenge à 70 points.
+
+Comme le dit la description :
+
+> Lorsque nous accédons à cette page, nous obtenons une erreur Forbidden. Cependant, nous pensons que quelque chose d'étrange se cache derrière...
+> Pouvez-vous trouver un moyen d'entrer et récupérer le flag ?
+
+![accès interdit](/blog/hackthebox-web-grammar/access.png)
+
+Cette page Forbidden n'est donc pas une surprise. Voyons si nous pouvons trouver des répertoires avec **DirBuster** :
+
+![dirbuster](/blog/hackthebox-web-grammar/dirbuster.png)
+
+Malheureusement, nous ne trouvons rien avec DirBuster, alors passons à autre chose.
+Voyons quelle est la réponse du serveur en utilisant curl sur **index.php** :
+
+```shell
+curl docker.hackthebox.eu:32410/index.php -v
+```
+
+![résultat de la commande curl dans le terminal](/blog/hackthebox-web-grammar/curl.png)
+
+Rien à déclarer ici non plus, c'est une réponse forbidden classique d'une requête HTTP GET...
+mais que se passe-t-il si nous essayons de faire du **Verb Tampering** ?
+C'est une attaque qui exploite les vulnérabilités dans les méthodes HTTP.
+De nombreux mécanismes d'authentification ne limitent l'accès qu'aux méthodes HTTP les plus courantes,
+permettant ainsi un accès non autorisé aux ressources restreintes via d'autres méthodes HTTP.
+Si vous voulez en savoir plus sur cette attaque, vous pouvez aller [ici](https://www.imperva.com/learn/application-security/http-verb-tampering/).
+
+Après avoir essayé différentes méthodes, la méthode OPTIONS semble être exploitable :
+
+```shell
+curl -X OPTIONS docker.hackthebox.eu:32410/index.php -v
+```
+
+![résultat de la commande curl dans le terminal](/blog/hackthebox-web-grammar/curl-2.png)
+
+Nous pouvons voir que le serveur a répondu en nous envoyant un cookie, et la réponse contient également un formulaire HTTP POST avec le commentaire :
+
+> HTB hint: vraiment pas important... totalement résoluble sans l'utiliser !
+> Juste là pour remplir et vous éviter des ennuis dans lesquels vous pourriez vous retrouver :)
+
+Ok, faisons confiance à cet indice et ne nous attardons pas sur ce formulaire. Nous allons plutôt nous concentrer sur le cookie que le serveur nous a gentiment envoyé.
+Il semble être encodé en Base64, nous pouvons le décoder en utilisant ce [site](https://www.base64decode.org/).
+
+Au premier essai ça ne fonctionne pas, et la raison est qu'il y a des données parasites à la fin du cookie encodé,
+donc après avoir supprimé le **%3D%3D**, qui n'a rien à faire là, le résultat est des données au format JSON :
+
+```json
+{
+  "User": "whocares",
+  "Admin": "False",
+  "MAC": "ff6d0a568d61e5a03bcdb04509d5885d"
+}
+```
+
+Premier réflexe, essayons d'envoyer une requête avec le champ **Admin** du cookie défini sur **True** :
+
+![résultat de la commande curl dans le terminal](/blog/hackthebox-web-grammar/huh.png)
+
+> What are you trying to do huh?
+
+Il semble que modifier le champ Admin ne suffit pas pour obtenir l'accès. Regardons donc le champ **MAC** du cookie.
+
+La page à laquelle nous voulons accéder est index.php, et nous supposons qu'il devrait y avoir un code PHP qui vérifie si nous avons
+la bonne valeur MAC pour nous autoriser l'accès. Nous pouvons donc potentiellement exploiter un **Type Juggling**.
+Il y a un comportement étrange dans le mécanisme de comparaison de PHP... Si PHP décide que les deux opérandes ressemblent à des nombres,
+même s'ils sont en réalité des chaînes de caractères, il les convertira tous les deux et effectuera une comparaison numérique.
+Vous pouvez lire ce [document](https://www.owasp.org/images/6/6b/PHPMagicTricks-TypeJuggling.pdf)
+si vous voulez en savoir plus sur le Type Juggling.
+
+Donc en changeant le champ MAC à la valeur **0**, nous pouvons déclencher un Type Juggling PHP et ainsi contourner la vérification du cookie.
+
+```json
+{ "User": "whocares", "Admin": "True", "MAC": 0 }
+```
+
+Essayons :
+
+![résultat du flag dans le terminal](/blog/hackthebox-web-grammar/bingo.png)
+
+BINGO ! Le flag apparaît dans la réponse HTML entre les balises \<h1\> !
