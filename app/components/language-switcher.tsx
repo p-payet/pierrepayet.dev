@@ -1,12 +1,13 @@
 'use client';
 
+import Image from 'next/image';
 import { useLocale } from 'next-intl';
 import { usePathname, useRouter } from '@/i18n/navigation';
 import { locales, type Locale } from '@/i18n/config';
 
 const localeLabels: Record<Locale, { flag: string; label: string }> = {
-  fr: { flag: '🇫🇷', label: 'Français' },
-  en: { flag: '🇬🇧', label: 'English' },
+  fr: { flag: '/fr-flag.svg', label: 'Français' },
+  en: { flag: '/uk-flag.svg', label: 'English' },
 };
 
 interface LanguageSwitcherProps {
@@ -55,9 +56,13 @@ export function LanguageSwitcher({ className = '' }: LanguageSwitcherProps) {
             aria-pressed={isActive}
             title={label}
           >
-            <span role="img" aria-hidden="true">
-              {flag}
-            </span>
+            <Image
+              src={flag}
+              alt={label}
+              width={20}
+              height={14}
+              aria-hidden="true"
+            />
           </button>
         );
       })}
