@@ -6,6 +6,7 @@ import { ArticleLink } from '@/app/components/article-link';
 import { Title } from '@/app/components/title';
 import { Avatar } from '@/app/components/avatar';
 import { type Locale } from '@/i18n/config';
+import { CVButton } from '@/app/components/cv-button';
 
 type Props = {
   params: Promise<{ locale: Locale }>;
@@ -37,13 +38,14 @@ export default async function Home({ params }: Props) {
         </p>
         <Link
           href={`/${locale}/info`}
-          className="group bg-slate-950 hover:bg-slate-800 transition-colors inline-block mt-8 font-mono text-xs font-semibold rounded-full px-8 py-3 text-white"
+          className="group bg-slate-950 hover:bg-slate-800 transition-colors inline-block mt-8 mr-8 font-mono text-xs font-semibold rounded-full px-8 py-3 text-white"
         >
           {t('moreInfo')}{' '}
           <span className="inline-block group-hover:translate-x-2 transition-transform">
             →
           </span>
         </Link>
+        <CVButton locale={locale} />
       </section>
 
       <section>
