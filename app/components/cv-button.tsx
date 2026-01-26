@@ -8,7 +8,7 @@ export async function CVButton({ locale }: { locale: string }) {
 
     return (
         <a
-            href={`/info/${cvFileName}`}
+            href={`/cv/${cvFileName}`}
             target="_blank"
             rel="noopener noreferrer"
             className="group bg-slate-950 hover:bg-slate-800 transition-colors inline-block font-mono text-xs font-semibold rounded-full px-8 py-3 text-white"
