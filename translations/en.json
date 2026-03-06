@@ -7,7 +7,7 @@
   },
   "home": {
     "greeting": "Hi, I'm Pierre 👋",
-    "subtitle": "Fullstack TypeScript / Node.js Developer, based in Lyon.",
+    "subtitle": "Fullstack Software Engineer - TypeScript / Node.js",
     "intro": "Web development is much more than code, it's bringing ideas to life. I design tailor-made, robust, and scalable solutions, always placing business needs at the heart of every technical decision.",
     "moreInfo": "More information",
     "latestArticles": "Latest articles",
@@ -20,18 +20,18 @@
   },
   "info": {
     "title": "Information",
-    "paragraph1": "As a fullstack developer at Inicio, a Paris-based startup dedicated to the energy transition, I took part in the design and development of a SaaS platform built for renewable energy developers. A concrete project aimed at accelerating the growth of solar energy in France and internationally.",
+    "paragraph1": "As a fullstack engineer at Inicio, a Paris-based startup dedicated to the energy transition, I took part in the design and development of a SaaS platform built for renewable energy developers. A concrete project aimed at accelerating the growth of solar energy in France and internationally.",
     "paragraph2": "Before that, I worked as a freelancer for the Lyon Metropolis, within a team dedicated to a Digital Workspace (ENT) for middle schools and elementary schools in the region. I contributed to the development of new features and the continuous improvement of the platform used by several hundred thousand users.",
-    "paragraph3": "I also held the position of back-end developer at Euronews, where I participated in migrating their infrastructure to AWS. I contributed to the development of new features as well as the continuous improvement of internal tools, including the CMS used by journalists to write and publish their articles on the Euronews website.",
+    "paragraph3": "I also held the position of fullstack engineer at Euronews, where I participated in migrating their infrastructure to AWS. I contributed to the development of new features as well as the continuous improvement of internal tools, including the CMS used by journalists to write and publish their articles on the Euronews website.",
     "paragraph4": "In addition to that, I've completed several small freelance web development projects. I also enjoy developing my own projects.",
     "viewCV": "View my CV",
     "experiences": "Experience"
   },
   "experience": {
-    "inicio": "FullStack Software Developer - Permanent",
-    "metropoleDeLyon": "Web Developer - Freelance",
-    "euronews": "Back-End Web Developer - Work-study then Fixed-term",
-    "synergiesTech": "Software Designer / Developer - Work-study",
+    "inicio": "Fullstack Software Engineer - Permanent",
+    "metropoleDeLyon": "Fullstack Software Engineer (frontend-focused) - Freelance",
+    "euronews": "Fullstack Software Engineer - Work-study then Fixed-term",
+    "synergiesTech": "Fullstack Software Engineer - Work-study",
     "orange": "IT Systems Manager - Internship then Temp"
   },
   "contact": {
@@ -55,8 +55,8 @@
     "and": "and"
   },
   "metadata": {
-    "title": "Pierre Payet - Fullstack TypeScript / Node.js Developer",
-    "description": "Pierre Payet - Fullstack TypeScript / Node.js Developer. I love building web applications, with a strong commitment to code quality. I enjoy front-end development as much as back-end.",
-    "jobTitle": "Fullstack TypeScript / Node.js Developer"
+    "title": "Pierre Payet - Fullstack Software Engineer - TypeScript / Node.js",
+    "description": "Pierre Payet - Fullstack Software Engineer - TypeScript / Node.js. I love building web applications, with a strong commitment to code quality. I enjoy front-end development as much as back-end.",
+    "jobTitle": "Fullstack Software Engineer - TypeScript / Node.js"
   }
 }

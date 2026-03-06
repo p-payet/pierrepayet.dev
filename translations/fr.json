@@ -7,7 +7,7 @@
   },
   "home": {
     "greeting": "Salut, moi c'est Pierre 👋",
-    "subtitle": "Développeur Fullstack TypeScript / Node.js, basé à Lyon.",
+    "subtitle": "Fullstack Software Engineer - TypeScript / Node.js",
     "intro": "Le développement web, c'est bien plus que du code, c'est donner vie à des idées. Je conçois des solutions sur-mesure, robustes et évolutives, en plaçant toujours les besoins métier au cœur de chaque décision technique.",
     "moreInfo": "Plus d'information",
     "latestArticles": "Derniers articles",
@@ -20,18 +20,18 @@
   },
   "info": {
     "title": "Information",
-    "paragraph1": "En tant que développeur fullstack chez Inicio, startup parisienne au service de la transition énergétique, j'ai pris part à la conception et au développement d'une plateforme SaaS pensée pour les développeurs d'énergies renouvelables. Un projet concret visant à faciliter l'essor du solaire en France et à l'international.",
+    "paragraph1": "En tant qu'ingénieur fullstack chez Inicio, startup parisienne au service de la transition énergétique, j'ai pris part à la conception et au développement d'une plateforme SaaS pensée pour les développeurs d'énergies renouvelables. Un projet concret visant à faciliter l'essor du solaire en France et à l'international.",
     "paragraph2": "Avant cela, j'ai travaillé en freelance pour la Métropole de Lyon, au sein d'une équipe dédiée à un Espace Numérique de Travail (ENT) destiné aux collèges et écoles de la région. J'ai contribué au développement de nouvelles fonctionnalités et à l'amélioration continue de la plateforme utilisée par plusieurs centaines de milliers d'utilisateurs.",
-    "paragraph3": "J'ai également occupé le poste de développeur back-end chez Euronews, où j'ai participé à la migration de leur infrastructure vers AWS. J'ai contribué au développement de nouvelles fonctionnalités ainsi qu'à l'amélioration continue des outils internes, notamment le CMS utilisé par les journalistes pour rédiger et publier leurs articles sur le site web d'Euronews.",
+    "paragraph3": "J'ai également occupé le poste de développeur fullstack chez Euronews, où j'ai participé à la migration de leur infrastructure vers AWS. J'ai contribué au développement de nouvelles fonctionnalités ainsi qu'à l'amélioration continue des outils internes, notamment le CMS utilisé par les journalistes pour rédiger et publier leurs articles sur le site web d'Euronews.",
     "paragraph4": "À côté de cela, j'ai effectué plusieurs petites missions freelance de développement web. J'aime également développer mes propres projets.",
     "viewCV": "Voir mon CV",
     "experiences": "Expériences"
   },
   "experience": {
-    "inicio": "Développeur FullStack - CDI",
-    "metropoleDeLyon": "Développeur Web - Freelance",
-    "euronews": "Développeur Web Back-End - Alternant puis CDD",
-    "synergiesTech": "Concepteur / Développeur Informatique - Alternant",
+    "inicio": "Fullstack Software Engineer - CDI",
+    "metropoleDeLyon": "Fullstack Software Engineer (frontend-focused) - Freelance",
+    "euronews": "Fullstack Software Engineer - Alternant puis CDD",
+    "synergiesTech": "Fullstack Software Engineer - Alternant",
     "orange": "Responsable Systèmes d'Informations - Stage puis Interim"
   },
   "contact": {
@@ -55,8 +55,8 @@
     "and": "et"
   },
   "metadata": {
-    "title": "Pierre Payet - Développeur Fullstack TypeScript / Node.js",
-    "description": "Pierre Payet - développeur Fullstack TypeScript / Node.js. J'aime concevoir des applications web, avec un fort engagement envers la qualité du code. J'apprécie le développement front-end autant que le back-end.",
-    "jobTitle": "Développeur Fullstack TypeScript / Node.js"
+    "title": "Pierre Payet - Fullstack Software Engineer - TypeScript / Node.js",
+    "description": "Pierre Payet - Fullstack Software Engineer - TypeScript / Node.js. J'aime concevoir des applications web, avec un fort engagement envers la qualité du code. J'apprécie le développement front-end autant que le back-end.",
+    "jobTitle": "Fullstack Software Engineer - TypeScript / Node.js"
   }
 }
