@@ -4,7 +4,7 @@ export async function CVButton({ locale }: { locale: string }) {
     setRequestLocale(locale);
     const t = await getTranslations('info');
 
-    const cvFileName = locale === 'fr' ? 'CV-Pierre-Payet-dev-fullstack-typescript-nodejs-FR.pdf' : 'CV-Pierre-Payet-dev-fullstack-typescript-nodejs-EN.pdf';
+    const cvFileName = `CV-Pierre-Payet-fullstack-software-engineer-${locale === 'fr' ? "FR" : "EN"}.pdf`;
 
     return (
         <a
