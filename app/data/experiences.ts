@@ -2,6 +2,12 @@ import { ExperienceData } from '@/app/components/experience';
 
 const experiences: Array<ExperienceData> = [
   {
+    company: 'Adtractive Group',
+    roleKey: 'adtractiveGroup',
+    startDate: '2025-12-05',
+    logo: '/info/adtractive-group-logo.png',
+  },
+  {
     company: 'Inicio',
     roleKey: 'inicio',
     startDate: '2025-01-06',
