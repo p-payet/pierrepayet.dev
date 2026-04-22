@@ -4,6 +4,14 @@ module.exports = {
   theme: {
     extend: {
       typography: {
+        DEFAULT: {
+          css: {
+            'em': {
+              fontStyle: 'normal',
+              fontVariationSettings: "'ital' 10",
+            },
+          },
+        },
         lg: {
           css: {
             h2: {

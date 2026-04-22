@@ -15,7 +15,10 @@ import { routing } from '@/i18n/routing';
 import { Locale } from '@/i18n/config';
 
 const SaansFont = localFont({
-  src: '../saans-font.woff2',
+  src: [
+    { path: '../saans-font.woff2', style: 'normal' },
+    { path: '../saans-font.woff2', style: 'italic' },
+  ],
   display: 'swap',
 });
 
