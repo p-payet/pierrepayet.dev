@@ -15,7 +15,6 @@ module.exports = {
         lg: {
           css: {
             h2: {
-              fontSize: '1.3rem',
               marginBottom: '1rem',
             },
           },
