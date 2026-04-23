@@ -1,0 +1,216 @@
+---
+title: "Unique Identity of Entities in DDD"
+summary: "The different strategies for creating unique entity identity, and why generation timing matters."
+---
+
+I'm currently reading **Implementing Domain-Driven Design** by Vaughn Vernon, also known as the *Red Book*.
+
+One of the latest passages I read particularly caught my attention: the section on unique identity of entities.
+
+It resonated with situations I've encountered in real projects:
+- Hesitating between letting the database generate an auto-incremented ID or generating a UUID on the application side.
+- Or finding yourself needing an entity's unique identity when it hasn't been generated yet.
+
+The book provides a clear framework for reasoning about these choices.
+
+Vernon identifies 4 strategies for creating unique identity, each with its own benefits and pitfalls:
+
+1. [The user provides identity](#user-provides-identity)
+2. [The application generates identity](#application-generates-identity)
+3. [The persistence mechanism generates identity](#persistence-generates-identity)
+4. [Another Bounded Context assigns identity](#another-bounded-context-assigns-identity)
+
+We'll also see that [the timing of identity generation](#timing-matters) matters more than you might think.
+
+*This article assumes familiarity with basic DDD concepts (entities, Bounded Context, Repository...).*
+
+---
+
+<a name="user-provides-identity"></a>
+## 1. The user provides identity
+
+This is the most straightforward approach: the user provides the value that will serve as the entity's unique identity. For example, a forum title, a discussion name, a manually defined product code...
+
+The benefit is clear: you get an identity that is meaningful and human-readable.
+
+But complications arise quickly. You're trusting the user to produce an identity that is unique, correct, and durable over time. That's a lot to ask.
+
+Let's take a concrete example. A user creates a discussion on a forum, and the title they type serves as the unique identity for the `Discussion` entity. What happens if they make a typo? Or if they decide six months later that the title is no longer relevant? As a rule, a unique identity should be immutable. So the cost of a mistake can be high.
+
+Vernon suggests several safeguards:
+
+- **A validation workflow**: in domains where throughput isn't critical, you can set up an approval process for the identity before its final creation. If the identity is going to be used for years across the entire system, investing a few extra cycles to verify its quality is a good investment.
+- **Separate identity from properties**: you can include user-entered values as entity properties (available for searching) without using them as the unique identity. The discussion title remains editable, identity is managed separately.
+
+Before adopting this strategy, you need to honestly ask yourself: can you rely on the user to produce a unique, correct, and long-lasting identity? And if the answer is no, what safeguards do you put in place?
+
+---
+
+<a name="application-generates-identity"></a>
+## 2. The application generates identity
+
+With this approach, the application itself generates the identity, typically via a **UUID** (Universally Unique Identifier) or **GUID** (Globally Unique Identifier).
+
+**The benefits are numerous:**
+
+- Near-absolute reliability in terms of uniqueness, even in distributed multi-node environments.
+- Fast generation: no interaction with any external system (database, network...).
+- Ability to cache pre-generated UUIDs for high-performance domains, without worrying about "gaps" on server restart (unlike database sequences).
+
+**But there are trade-offs:**
+
+- The format is not human-readable at all. You're not going to display `f36ab21c-67dc-5274-c642-1de2f4d5e72a` on a user interface.
+- The size (16 bytes) can, in rare cases, cause memory issues when handling a very large volume of entities.
+
+### How to work around the readability problem?
+
+Vernon proposes several interesting solutions to mitigate the lack of UUID readability:
+
+- **Hyperlinks**: the UUID can be hidden in the URI, and the link text remains readable for the user.
+- **Using partial UUID segments**: depending on your confidence in uniqueness, you can use just one or a few segments of the full UUID.
+- **Human-readable composite identities**: this is the most elegant approach. You build an identity combining business information with a UUID segment to guarantee uniqueness. For example:
+
+```
+APM-P-04-22-2026-F36AB21C
+```
+
+Here, you can read: a Product (P) from the Agile Project Management context (APM), created on April 22, 2026. The `F36AB21C` segment (the first chunk of a UUID) ensures uniqueness among products created on the same day. Readable, traceable, and with a very high probability of global uniqueness.
+
+This kind of composite identity shouldn't be stored in a simple `String`. A dedicated **Value Object** is much better suited:
+
+```TypeScript
+class ProductId {
+  private static readonly FORMAT = /^[A-Z]+-[A-Z]-\d{2}-\d{2}-\d{4}-[0-9A-F]{8}$/;
+
+  constructor(private readonly value: string) {
+    if (!ProductId.FORMAT.test(value)) {
+      throw new Error(`Invalid ProductId format: ${value}`);
+    }
+  }
+
+  get creationDate(): Date {
+    const parts = this.value.split('-');
+
+    return new Date(`${parts[4]}-${parts[2]}-${parts[3]}`);
+  }
+}
+
+const productId = new ProductId("APM-P-04-22-2026-F36AB21C");
+const productIdCreationDate = productId.creationDate;
+```
+
+The client can query the identity for information (here, the creation date) without knowing the raw format. The `Product` entity itself can expose this date without revealing how it's obtained.
+
+Vernon recommends using the **Repository** as a Factory for identity generation (via a `nextIdentity()` method), a natural fit since the Repository is already responsible for the Aggregate's persistence lifecycle.
+
+---
+
+<a name="persistence-generates-identity"></a>
+## 3. The persistence mechanism generates identity
+
+Here, identity generation is delegated to the persistence system, typically via a sequence or an auto-incremented column in a database.
+
+**The main benefit**: uniqueness is guaranteed by the database itself. Depending on the need, you can get a 2-byte value (up to ~32,000 values), 4-byte (~2 billion), or 8-byte (~9.2 × 10¹⁸ values). These identities are compact and facilitate joins, indexes, and referential integrity.
+
+**The main drawback**: performance. Each generation requires a round trip to the database, which can become a bottleneck under heavy load. It's possible to pre-allocate and cache value ranges on the application side, but you then accept losing unused values on server restart, creating "gaps" in the sequence.
+
+The other major issue with this approach is that it often implies **late identity generation**: the ID is only assigned at INSERT time. The consequences of this timing are detailed further below.
+
+It is, however, possible to achieve early generation with a database. The Repository can query the sequence upfront and return the next available identity:
+
+```TypeScript
+class ProductRepository {
+  async nextIdentity(): Promise<ProductId> {
+    const result = await this.db.query(
+      "SELECT nextval('product_seq') AS id"
+    );
+
+    return new ProductId(result.rows[0].id);
+  }
+}
+```
+
+This follows the same `nextIdentity()` pattern as application-generated identity, but the value comes from the database. The entity can thus receive its identity from construction time.
+
+---
+
+<a name="another-bounded-context-assigns-identity"></a>
+## 4. Another Bounded Context assigns identity
+
+This is the most complex strategy. It comes into play when the local entity in our Bounded Context is tied to an entity from an external system.
+
+Let's take an example: a product management application composed of several Bounded Contexts. One of them handles product inventory. In this context, a search interface lets the user enter a criterion (for example, a partial name) that queries the API of an external Bounded Context. It returns zero, one, or multiple results. The user selects the desired product, and the selected result's identity is used to create the local `Product` entity. Additional properties from the foreign entity may also be copied locally.
+
+### The synchronization problem
+
+This is where things get tricky. What happens if the referenced entity in the external system changes? How do you know it's been modified?
+
+Vernon's recommended solution is to use an **Event-Driven architecture** with **Domain Events**. The local Bounded Context subscribes to events published by external systems. When a relevant notification is received, the local system updates its own Aggregates to reflect the state of the external entities. Sometimes, synchronization can also go the other way: the local context pushes changes back to the originating system.
+
+This is, by far, the heaviest strategy to maintain. The local entity depends not only on its own business changes but also on those occurring in one or more external systems. Vernon recommends using it as sparingly as possible.
+
+---
+
+<a name="timing-matters"></a>
+## When identity generation timing matters
+
+Identity generation can happen at two points: **early**, during the object's construction, or **late**, during its persistence. In some cases, this choice is inconsequential. In others, it has direct consequences on system behavior.
+
+### Late generation
+
+Let's consider the simplest case: we tolerate identity being assigned at INSERT time.
+
+```
+  Client             Product          ProductRepository       Database
+    |                   |                    |                    |
+    |-- new Product() ->|                    |                    |
+    |                   |                    |                    |
+    |-- add(product) ------ add(product) --->|                    |
+    |                   |                    |---- INSERT ------->|
+    |                   |                    |<--- generated id --|
+    |                   |<-- setProductId() -|                    |
+    |                   |                    |                    |
+```
+
+The client creates the `Product`, hands it to the `ProductRepository` which inserts it into the database. The database generates the identity, which is then assigned to the entity. Simple and effective.
+
+### Why timing can be a problem
+
+Consider the following scenario:
+
+1. The client subscribes to outgoing **Domain Events**.
+2. A `ProductCreated` event is emitted when a new `Product` is successfully instantiated.
+3. The client stores the received event in an **Event Store**, which will later be published as notifications to other Bounded Contexts.
+
+With late generation, the `ProductCreated` event is emitted **before** the `Product` has been persisted and received its identity. The Domain Event will therefore not contain the product's valid identity. This is a silent bug that can have cascading effects on subscribing systems.
+
+### Early generation
+
+To solve this problem, we generate the identity upfront, before even constructing the entity:
+
+```
+  Client             Product          ProductRepository       Database
+    |                   |                    |                    |
+    |------------- nextIdentity() ---------->|                    |
+    |<------------ ProductId ----------------|                    |
+    |                   |                    |                    |
+    |-- new Product(id) |                    |                    |
+    |                   |                    |                    |
+    |-- add(product) ------ add(product) --->|                    |
+    |                   |                    |---- INSERT ------->|
+    |                   |                    |                    |
+```
+
+The client first requests the next identifier from the `ProductRepository` via `nextIdentity()`, then creates the `Product` with that identifier. When the `ProductCreated` event is emitted, it already contains the correct identity.
+
+---
+
+## To conclude
+
+This passage from the *Red Book* helped me establish a more rigorous framework for a topic we often handle out of habit or by default (how many times have I seen, and done, an `id INT AUTO_INCREMENT` without giving it a second thought).
+
+What I take away most is that there's no universal strategy. The right choice depends on context: does the identity need to be readable? generated before persistence? shared across systems? Each constraint points toward a different strategy.
+
+And beyond the generation strategy itself, the question of timing is just as important, and often overlooked.
+
+The book also covers related topics I didn't address here, notably Surrogate Identity, which involves maintaining both a business identity and a technical identity to satisfy the ORM. It also addresses Identity Stability and the mechanisms to ensure an identity is never modified after creation.
