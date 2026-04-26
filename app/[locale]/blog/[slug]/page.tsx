@@ -1,5 +1,4 @@
 import { Metadata, ResolvingMetadata } from 'next';
-import dynamic from 'next/dynamic';
 import { notFound } from 'next/navigation';
 import { MDXRemote } from 'next-mdx-remote/rsc';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
@@ -7,34 +6,8 @@ import '@/app/assets/github-dark.css';
 import remarkGfm from 'remark-gfm';
 import rehypeHighlight from 'rehype-highlight';
 import { getAllPostPaths, getPostBySlug } from '@/lib/articles';
-import { ScrollAnimationDemoOne } from '@/app/components/posts/scroll-animation-wrapper';
 import { routing } from '@/i18n/routing';
 import { type Locale } from '@/i18n/config';
-
-const TextWrapHero = dynamic(
-  () =>
-    import('@/app/components/posts/2024-05-21-future-css-text-wrap-pretty').then(
-      (mod) => mod.TextWrapHero
-    )
-);
-const TextWrapPrettyVsBalance = dynamic(
-  () =>
-    import('@/app/components/posts/2024-05-21-future-css-text-wrap-pretty').then(
-      (mod) => mod.TextWrapPrettyVsBalance
-    )
-);
-const DebouncedSearchInput = dynamic(
-  () =>
-    import(
-      '@/app/components/posts/2024-06-27-debouncing-an-input-in-react'
-    ).then((mod) => mod.DebouncedSearchInput)
-);
-const SearchInput = dynamic(
-  () =>
-    import(
-      '@/app/components/posts/2024-06-27-debouncing-an-input-in-react'
-    ).then((mod) => mod.SearchInput)
-);
 
 // Custom img component with lazy loading to prevent preload warnings
 function MDXImage({
@@ -135,11 +108,6 @@ export default async function Post(props: { params: Promise<Params> }) {
             source={content}
             components={{
               img: MDXImage,
-              ScrollAnimationDemoOne,
-              TextWrapHero,
-              TextWrapPrettyVsBalance,
-              SearchInput,
-              DebouncedSearchInput,
             }}
             options={{
               mdxOptions: {
