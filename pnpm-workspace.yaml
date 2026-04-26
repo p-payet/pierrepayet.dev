@@ -3,3 +3,6 @@ packages:
 strictDepBuilds: true
 minimumReleaseAge: 10080 # 7 days
 trustPolicy: no-downgrade
+trustPolicyExclude:
+  - semver@6.3.1
+  - chokidar@4.0.3
