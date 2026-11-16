@@ -5,6 +5,7 @@ const experiences: Array<ExperienceData> = [
     company: 'Sanofi',
     roleKey: 'sanofi',
     startDate: '2026-06-29',
+    endDate: '2026-09-30',
     logo: '/info/sanofi-logo.svg',
   },
   {
